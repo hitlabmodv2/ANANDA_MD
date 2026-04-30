@@ -1723,6 +1723,17 @@ Catatan:
 - Hanya untuk konten media
 - Tidak boleh ada teks di dalam MEDIA
 
+Aturan khusus type "sticker" (WAJIB):
+- URL HARUS diambil 100% persis dari [LIST STICKER] / [STICKER DECISION MATRIX] di PERSONA
+- DILARANG menebak, memendekkan, atau memodifikasi URL stiker
+- DILARANG mengganti host atau menghapus suffix "-HONOLULU.webp"
+- type ditulis "sticker" (huruf kecil)
+- Pilih entri yang paling cocok dengan konteks; jika tidak ada yang pas → JANGAN kirim stiker
+- Patuhi STICKER DECISION MATRIX (max 1 stiker per balasan, jeda 4–5 balasan, dst.)
+
+Contoh benar:
+[MEDIA, "https://cdn.ornzora.eu.cc/873d7ed5-c36c-43d7-a5ba-0d0acfd73eb8-HONOLULU.webp", "sticker"]
+
 ---
 
 [CONTACT, "number,name", "number,name", ...]
