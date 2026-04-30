@@ -13,9 +13,11 @@ replit.md
 data
 index.d.ts
 
-# Force-include node_modules dan .replit (override system gitignore)
-!node_modules
-!node_modules/**
+# node_modules JANGAN ikut ke-upload ke GitHub
+node_modules
+node_modules/**
+
+# Force-include .replit (override system gitignore)
 !.replit
 
 # Sessions — cuma 3 file penting di hisoka yang di-upload

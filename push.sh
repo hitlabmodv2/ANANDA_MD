@@ -331,6 +331,17 @@ prepare_stage() {
     esac
   done
 
+  # Auto-untrack node_modules dari git index (file di disk tetap aman).
+  # Ini one-time cleanup: setelah push pertama selesai, node_modules
+  # gak akan ke-upload lagi karena udah di-ignore + di-untrack.
+  local nm_tracked
+  nm_tracked=$(git ls-files node_modules 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$nm_tracked" -gt 0 ]; then
+    echo -e "  ${C_YELLOW}🧹 Untrack node_modules dari git (${nm_tracked} file)...${C_RESET}"
+    git rm -r --cached -q node_modules 2>>"$err_log" || true
+    echo -e "  ${C_DIM}   (file di disk tetap ada, cuma dilepas dari tracking git)${C_RESET}"
+  fi
+
   # Stage SEMUA perubahan (baru, modified, deleted, rename).
   if ! git add -A 2>>"$err_log"; then
     echo -e "  ${C_RED}❌ git add -A gagal${C_RESET}"
@@ -340,12 +351,13 @@ prepare_stage() {
   fi
 
   # Force-add file penting yang biasanya di-ignore.
+  # CATATAN: node_modules SENGAJA TIDAK di-force-add — biar gak ke-upload ke GitHub.
   for forced in package-lock.json .env \
                 sessions/hisoka/creds.json \
                 sessions/hisoka/contacts.json \
                 sessions/hisoka/groups.json \
                 attached_assets .agents \
-                .replit node_modules; do
+                .replit; do
     [ -e "$forced" ] || continue
     git add -f "$forced" 2>>"$err_log" || true
   done
