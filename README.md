@@ -4,8 +4,8 @@
 
 <br/>
 
-<a href="https://replit.com/github/AgusXzz/ChiiMD">
-  <img src="https://replit.com/badge/github/AgusXzz/ChiiMD" alt="Run on Replit" height="45"/>
+<a href="https://replit.com/github/hitlabmodv2/ANANDA_MD">
+  <img src="https://replit.com/badge/github/hitlabmodv2/ANANDA_MD" alt="Run on Replit" height="45"/>
 </a>
 
 <h1>🌙 ChiiBot</h1>
@@ -13,10 +13,10 @@
 <p><em>Bot WhatsApp Multi-Device — Ringan, Modern, dan Mudah Dikembangkan</em></p>
 
 <p>
-  <a href="https://github.com/AgusXzz/ChiiMD/stargazers"><img src="https://img.shields.io/github/stars/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=ffc107&labelColor=1a1a2e" alt="Stars"></a>
-  <a href="https://github.com/AgusXzz/ChiiMD/network/members"><img src="https://img.shields.io/github/forks/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=9c27b0&labelColor=1a1a2e" alt="Forks"></a>
-  <a href="https://github.com/AgusXzz/ChiiMD/issues"><img src="https://img.shields.io/github/issues/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=ef4444&labelColor=1a1a2e" alt="Issues"></a>
-  <a href="https://github.com/AgusXzz/ChiiMD/blob/main/LICENSE"><img src="https://img.shields.io/github/license/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=3b82f6&labelColor=1a1a2e" alt="License"></a>
+  <a href="https://github.com/hitlabmodv2/ANANDA_MD/stargazers"><img src="https://img.shields.io/github/stars/hitlabmodv2/ANANDA_MD?style=for-the-badge&logo=github&color=ffc107&labelColor=1a1a2e" alt="Stars"></a>
+  <a href="https://github.com/hitlabmodv2/ANANDA_MD/network/members"><img src="https://img.shields.io/github/forks/hitlabmodv2/ANANDA_MD?style=for-the-badge&logo=github&color=9c27b0&labelColor=1a1a2e" alt="Forks"></a>
+  <a href="https://github.com/hitlabmodv2/ANANDA_MD/issues"><img src="https://img.shields.io/github/issues/hitlabmodv2/ANANDA_MD?style=for-the-badge&logo=github&color=ef4444&labelColor=1a1a2e" alt="Issues"></a>
+  <a href="https://github.com/hitlabmodv2/ANANDA_MD/blob/main/LICENSE"><img src="https://img.shields.io/github/license/hitlabmodv2/ANANDA_MD?style=for-the-badge&logo=github&color=3b82f6&labelColor=1a1a2e" alt="License"></a>
 </p>
 
 <p>
@@ -84,8 +84,8 @@ Bot ini dilengkapi dengan berbagai fitur yang terorganisir dalam plugin untuk me
 Tidak perlu install Node.js, Git, atau apapun. Cukup klik tombol di bawah dan bot akan langsung tersedia di browser Anda:
 
 <p align="center">
-  <a href="https://replit.com/github/AgusXzz/ChiiMD">
-    <img src="https://replit.com/badge/github/AgusXzz/ChiiMD" alt="Run on Replit" height="50"/>
+  <a href="https://replit.com/github/hitlabmodv2/ANANDA_MD">
+    <img src="https://replit.com/badge/github/hitlabmodv2/ANANDA_MD" alt="Run on Replit" height="50"/>
   </a>
 </p>
 
@@ -117,7 +117,7 @@ Pastikan sistem Anda memenuhi requirement berikut:
 1. **Clone repository ini:**
 
     ```bash
-    git clone https://github.com/AgusXzz/ChiiMD.git
+    git clone https://github.com/hitlabmodv2/ANANDA_MD.git
     cd ChiiMD
     ```
 
@@ -333,7 +333,7 @@ Jika Anda memiliki pertanyaan atau membutuhkan bantuan:
 
 - **Group WhatsApp:** [Join Group](https://chat.whatsapp.com/ELDiJRVGKAk5BpQ0o9cSr9?mode=hqrc)
 - **Channel WhatsApp:** [Follow Channel](https://whatsapp.com/channel/0029Vb5rT77Ae5Vqi7s27P3L)
-- **Issues:** [GitHub Issues](https://github.com/AgusXzz/ChiiMD/issues)
+- **Issues:** [GitHub Issues](https://github.com/hitlabmodv2/ANANDA_MD/issues)
 
 ---
 
