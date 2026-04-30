@@ -28,7 +28,7 @@ let handler = async (m, { conn, text, usedPrefix, command, groupMetadata, isOwne
         if (command == "fioraupdp") {
                 if(!isOwner) return
                 if(!m.quoted?.text) return m.reply("Reply teks prompt!");
-                await fs.writeFileSync('./lib/Fiora-PERSONA.txt', m.quoted.text)
+                await fs.writeFileSync('./lib/Honolulu-PERSONA.txt', m.quoted.text)
                 return m.reply("Success Update Persona.") 
                 }
         if (command == "fioraresetdb") {
@@ -1442,7 +1442,7 @@ mime: ${qFile.mimetype}`
 function prompt(user, m) {
         const time = getWIBDateTime()
         //const FACES = fs.readFileSync('./lib/F-59.txt').toString()
-        const PERSONA = fs.readFileSync('./lib/Fiora-PERSONA.txt').toString() 
+        const PERSONA = fs.readFileSync('./lib/Honolulu-PERSONA.txt').toString() 
         return `[SYSTEM PROMPT]\n
 ${PERSONA}
 
