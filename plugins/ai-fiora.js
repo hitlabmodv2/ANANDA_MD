@@ -573,27 +573,41 @@ async function fioraResponse(response, conn, m, { startThinking }) {
     }
 
     if (type === "ALBUM") {
-      const rawUrls = Array.isArray(value) ? value.flat() : []
-      const cleaned = rawUrls
-        .filter(u => typeof u === "string")
-        .map(u => u.trim())
-        .filter(u => u.length > 0 && /^https?:\/\//i.test(u))
+      const rawItems = Array.isArray(value) ? value.flat() : []
 
-      const unique = [...new Set(cleaned)]
+      const parsed = []
+      const seenUrls = new Set()
+      for (const raw of rawItems) {
+        if (typeof raw !== "string") continue
+        const sepIdx = raw.indexOf("|")
+        const urlPart = (sepIdx >= 0 ? raw.slice(0, sepIdx) : raw).trim()
+        const captionPart = sepIdx >= 0 ? raw.slice(sepIdx + 1).trim() : ""
+        if (!urlPart || !/^https?:\/\//i.test(urlPart)) continue
+        if (seenUrls.has(urlPart)) continue
+        seenUrls.add(urlPart)
+        const safeCaption = captionPart
+          .replace(/\s+/g, " ")
+          .slice(0, 200)
+        parsed.push({ url: urlPart, caption: safeCaption })
+      }
 
-      if (unique.length < 2) {
-        console.warn(`[ALBUM] Skipped — butuh min 2 URL valid (got ${unique.length})`)
+      if (parsed.length < 2) {
+        console.warn(`[ALBUM] Skipped — butuh min 2 URL valid (got ${parsed.length})`)
       } else {
-        const limited = unique.slice(0, 10)
+        const limited = parsed.slice(0, 10)
         try {
           await conn.sendAlbum(m.chat, limited, { quoted: m, messageId: generateFioraID() })
         } catch (err) {
           console.warn(`[ALBUM] Gagal kirim album (${limited.length} item): ${err?.message || err}`)
-          for (const u of limited) {
+          for (const item of limited) {
             try {
-              await conn.sendMessage(m.chat, { image: { url: u } }, { quoted: m, messageId: generateFioraID() })
+              await conn.sendMessage(
+                m.chat,
+                { image: { url: item.url }, caption: item.caption || undefined },
+                { quoted: m, messageId: generateFioraID() }
+              )
             } catch (e) {
-              console.warn(`[ALBUM] fallback image gagal (${u}): ${e?.message || e}`)
+              console.warn(`[ALBUM] fallback image gagal (${item.url}): ${e?.message || e}`)
             }
           }
         }
@@ -1907,27 +1921,43 @@ Contoh benar:
 
 ---
 
-[ALBUM, "url1", "url2", "url3", ...]
-→ Mengirim beberapa GAMBAR/VIDEO sebagai 1 album WhatsApp (preview grid).
+[ALBUM, "url1|caption1", "url2|caption2", "url3|caption3", ...]
+→ Mengirim beberapa GAMBAR/VIDEO sebagai 1 album WhatsApp (preview grid),
+  setiap item BISA dikasih caption sendiri.
+
+Format tiap item:
+- "url" saja                 → tanpa caption
+- "url|caption"              → URL + caption (pemisah karakter "|")
+- caption boleh kosong       → "url|" atau "url" → sama saja
 
 Aturan WAJIB:
-- Minimal 2 URL, maksimal 10 URL.
+- Minimal 2 item, maksimal 10 item.
 - Semua URL HARUS valid (diawali https:// atau http://).
 - URL boleh image (.jpg/.png/.webp) atau video (.mp4) — JANGAN sticker / audio.
 - Jangan duplikat URL yang sama.
-- Hanya pakai ALBUM kalau user memang minta lebih dari 1 gambar/foto/video
-  (contoh: "kirim 3 gambar kucing", "ada gak fotonya yang lain juga", "kasih beberapa contoh").
+- Caption per item maksimal ~200 karakter (auto-trim kalau lebih).
+- Caption HARUS pakai voice Honolulu: tenang, lowercase, singkat, natural,
+  bahasa indo casual, no kapital alay, no emoji berlebihan.
+  (Detail lebih lengkap di [SECTION KIRIM BANYAK GAMBAR / ALBUM] di PERSONA.)
+- Hanya pakai ALBUM kalau user memang minta >1 gambar/foto/video.
 - Kalau user cuma minta 1 → pakai [MEDIA, url, "image"] biasa, JANGAN ALBUM.
-- Kalau user minta lebih dari 10 → tetap kirim 10 saja (cap maksimum), beri tahu user di teks
-  bahwa Honolulu ngirim 10 dulu biar nggak overload.
-- Untuk hasil SEARCH/DOWNLOAD multi-item, gabungkan jadi satu ALBUM, bukan banyak MEDIA terpisah.
+- Kalau user minta >10 → tetap kirim 10 saja (cap maksimum).
+- Untuk hasil SEARCH/DOWNLOAD multi-item, gabungkan jadi satu ALBUM.
 
-Contoh benar (3 gambar):
-[ALBUM, "https://example.com/1.jpg", "https://example.com/2.jpg", "https://example.com/3.jpg"]
+Contoh benar (3 gambar dengan caption khas Honolulu):
+[ALBUM,
+ "https://example.com/1.jpg|yg ini paling soft, cocok jdi wallpaper",
+ "https://example.com/2.jpg|warnanya lebih gelap, lebih moody",
+ "https://example.com/3.jpg|yang terakhir, simple aj tpi rapi"]
+
+Contoh benar (tanpa caption — boleh):
+[ALBUM, "https://example.com/a.jpg", "https://example.com/b.jpg"]
 
 Contoh SALAH:
 ❌ [ALBUM, "https://example.com/1.jpg"]               (cuma 1 → pakai MEDIA biasa)
-❌ [ALBUM, "https://example.com/1.jpg", "url-kosong"] (URL invalid)
+❌ [ALBUM, "https://example.com/1.jpg|", "url-kosong|caption"] (URL ke-2 invalid)
+❌ [ALBUM, "https://x.com/1.jpg|GAMBAR PERTAMA YANG SANGAT BAGUS BANGET KEREN!!!"]
+   (caption kapital alay & lebay — bukan voice Honolulu)
 ❌ kirim 11+ MEDIA berturut-turut padahal user minta beberapa gambar
    (yang benar: gabung jadi 1 ALBUM max 10)
 
