@@ -485,6 +485,19 @@ async function fioraResponse(response, conn, m, { startThinking }) {
     }
   }
 
+  try {
+    const summary = response.map(r => Array.isArray(r) ? r[0] : typeof r).join(", ")
+    console.log(`[AI-DEBUG] Honolulu emit ${response.length} actions: [${summary}]`)
+    const albumActions = response.filter(r => Array.isArray(r) && r[0] === "ALBUM")
+    for (const a of albumActions) {
+      console.log(`[AI-DEBUG] ALBUM raw payload (${a.length - 1} items):`, JSON.stringify(a.slice(1)))
+    }
+    const mediaActions = response.filter(r => Array.isArray(r) && r[0] === "MEDIA")
+    for (const a of mediaActions) {
+      console.log(`[AI-DEBUG] MEDIA raw payload:`, JSON.stringify(a.slice(1)))
+    }
+  } catch (e) {}
+
   for (let i = 0; i < response.length; i++) {
     const [type, ...value] = response[i]
 
@@ -591,14 +604,21 @@ async function fioraResponse(response, conn, m, { startThinking }) {
         parsed.push({ url: urlPart, caption: safeCaption })
       }
 
+      console.log(`[ALBUM] Parsed ${parsed.length} valid items dari ${rawItems.length} raw`)
       if (parsed.length < 2) {
-        console.warn(`[ALBUM] Skipped — butuh min 2 URL valid (got ${parsed.length})`)
+        console.warn(`[ALBUM] Skipped — butuh min 2 URL valid (got ${parsed.length}). Raw items:`, JSON.stringify(rawItems))
       } else {
         const limited = parsed.slice(0, 10)
+        const albumMedias = limited.map(item => ({
+          image: { url: item.url },
+          caption: item.caption || ""
+        }))
+        console.log(`[ALBUM] Mengirim ${limited.length} item ke ${m.chat}. URLs:`, limited.map(x => x.url))
         try {
-          await conn.sendAlbum(m.chat, limited, { quoted: m, messageId: generateFioraID() })
+          await conn.sendAlbumMessage(m.chat, albumMedias, { quoted: m, messageId: generateFioraID() })
+          console.log(`[ALBUM] ✅ Sukses kirim ${limited.length} item sebagai album`)
         } catch (err) {
-          console.warn(`[ALBUM] Gagal kirim album (${limited.length} item): ${err?.message || err}`)
+          console.warn(`[ALBUM] sendAlbumMessage gagal (${limited.length} item): ${err?.message || err}. Fallback ke kirim image satu-satu.`)
           for (const item of limited) {
             try {
               await conn.sendMessage(
