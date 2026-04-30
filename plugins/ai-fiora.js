@@ -485,19 +485,6 @@ async function fioraResponse(response, conn, m, { startThinking }) {
     }
   }
 
-  try {
-    const summary = response.map(r => Array.isArray(r) ? r[0] : typeof r).join(", ")
-    console.log(`[AI-DEBUG] Honolulu emit ${response.length} actions: [${summary}]`)
-    const albumActions = response.filter(r => Array.isArray(r) && r[0] === "ALBUM")
-    for (const a of albumActions) {
-      console.log(`[AI-DEBUG] ALBUM raw payload (${a.length - 1} items):`, JSON.stringify(a.slice(1)))
-    }
-    const mediaActions = response.filter(r => Array.isArray(r) && r[0] === "MEDIA")
-    for (const a of mediaActions) {
-      console.log(`[AI-DEBUG] MEDIA raw payload:`, JSON.stringify(a.slice(1)))
-    }
-  } catch (e) {}
-
   for (let i = 0; i < response.length; i++) {
     const [type, ...value] = response[i]
 
@@ -541,96 +528,28 @@ async function fioraResponse(response, conn, m, { startThinking }) {
     if (type === "MEDIA") {
       const [url, mediaType] = value
 
-      const isValidUrl = typeof url === "string"
-        && url.trim().length > 0
-        && /^https?:\/\//i.test(url.trim())
-
-      if (!isValidUrl) {
-        console.warn(`[MEDIA] Skipped — URL kosong/invalid (type=${mediaType}, url=${JSON.stringify(url)})`)
-      } else {
-        const cleanUrl = url.trim()
-
-        if (mediaType === "image" || mediaType === "video") {
-          await conn.sendMessage(
-            m.chat,
-            { [mediaType]: { url: cleanUrl } },
-            { quoted: m, messageId: generateFioraID() }
-          )
-        }
-
-        if (mediaType === "sticker") {
-          const isOfficial = !!findStickerMeta(cleanUrl)
-          if (!isOfficial) {
-            console.warn(`[STICKER] Skipped — URL tidak ada di daftar resmi: ${cleanUrl}`)
-          } else {
-            try {
-              const { data, mime } = await conn.getFile(cleanUrl);
-              const exif = { packName: global.stickpack, packPublish: global.stickauth };
-              const sticker = await (await import('../lib/exif.js')).writeExif({ mimetype: mime, data }, exif);
-              await conn.sendMessage(m.chat, { sticker }, { quoted: m, messageId: generateFioraID() });
-              try { trackStickerUsage(cleanUrl, m.chat, m.sender); } catch(e) {}
-            } catch (err) {
-              console.warn(`[STICKER] Gagal kirim (${cleanUrl}): ${err?.message || err}`)
-            }
-          }
-        }
-
-        if (mediaType === "audio") {
-          await conn.sendMessage(
-            m.chat,
-            { audio: { url: cleanUrl }, mimetype: "audio/mp4", ptt: false },
-            { quoted: m, messageId: generateFioraID() }
-          )
-        }
-      }
-    }
-
-    if (type === "ALBUM") {
-      const rawItems = Array.isArray(value) ? value.flat() : []
-
-      const parsed = []
-      const seenUrls = new Set()
-      for (const raw of rawItems) {
-        if (typeof raw !== "string") continue
-        const sepIdx = raw.indexOf("|")
-        const urlPart = (sepIdx >= 0 ? raw.slice(0, sepIdx) : raw).trim()
-        const captionPart = sepIdx >= 0 ? raw.slice(sepIdx + 1).trim() : ""
-        if (!urlPart || !/^https?:\/\//i.test(urlPart)) continue
-        if (seenUrls.has(urlPart)) continue
-        seenUrls.add(urlPart)
-        const safeCaption = captionPart
-          .replace(/\s+/g, " ")
-          .slice(0, 200)
-        parsed.push({ url: urlPart, caption: safeCaption })
+      if (mediaType === "image" || mediaType === "video") {
+        await conn.sendMessage(
+          m.chat,
+          { [mediaType]: { url } },
+          { quoted: m, messageId: generateFioraID() }
+        )
       }
 
-      console.log(`[ALBUM] Parsed ${parsed.length} valid items dari ${rawItems.length} raw`)
-      if (parsed.length < 2) {
-        console.warn(`[ALBUM] Skipped — butuh min 2 URL valid (got ${parsed.length}). Raw items:`, JSON.stringify(rawItems))
-      } else {
-        const limited = parsed.slice(0, 10)
-        const albumMedias = limited.map(item => ({
-          image: { url: item.url },
-          caption: item.caption || ""
-        }))
-        console.log(`[ALBUM] Mengirim ${limited.length} item ke ${m.chat}. URLs:`, limited.map(x => x.url))
-        try {
-          await conn.sendAlbumMessage(m.chat, albumMedias, { quoted: m, messageId: generateFioraID() })
-          console.log(`[ALBUM] ✅ Sukses kirim ${limited.length} item sebagai album`)
-        } catch (err) {
-          console.warn(`[ALBUM] sendAlbumMessage gagal (${limited.length} item): ${err?.message || err}. Fallback ke kirim image satu-satu.`)
-          for (const item of limited) {
-            try {
-              await conn.sendMessage(
-                m.chat,
-                { image: { url: item.url }, caption: item.caption || undefined },
-                { quoted: m, messageId: generateFioraID() }
-              )
-            } catch (e) {
-              console.warn(`[ALBUM] fallback image gagal (${item.url}): ${e?.message || e}`)
-            }
-          }
-        }
+      if (mediaType === "sticker") {
+        const { data, mime } = await conn.getFile(url);
+                        const exif = { packName: global.stickpack, packPublish: global.stickauth };
+                        const sticker = await (await import('../lib/exif.js')).writeExif({ mimetype: mime, data }, exif);
+                        await conn.sendMessage(m.chat, { sticker }, { quoted: m, messageId: generateFioraID() });
+                        try { trackStickerUsage(url, m.chat, m.sender); } catch(e) {}
+      }
+
+      if (mediaType === "audio") {
+        await conn.sendMessage(
+          m.chat,
+          { audio: { url }, mimetype: "audio/mp4", ptt: false },
+          { quoted: m, messageId: generateFioraID() }
+        )
       }
     }
 
@@ -1938,48 +1857,6 @@ Aturan khusus type "sticker" (WAJIB):
 
 Contoh benar:
 [MEDIA, "https://cdn.ornzora.eu.cc/873d7ed5-c36c-43d7-a5ba-0d0acfd73eb8-FIORA.webp", "sticker"]
-
----
-
-[ALBUM, "url1|caption1", "url2|caption2", "url3|caption3", ...]
-→ Mengirim beberapa GAMBAR/VIDEO sebagai 1 album WhatsApp (preview grid),
-  setiap item BISA dikasih caption sendiri.
-
-Format tiap item:
-- "url" saja                 → tanpa caption
-- "url|caption"              → URL + caption (pemisah karakter "|")
-- caption boleh kosong       → "url|" atau "url" → sama saja
-
-Aturan WAJIB:
-- Minimal 2 item, maksimal 10 item.
-- Semua URL HARUS valid (diawali https:// atau http://).
-- URL boleh image (.jpg/.png/.webp) atau video (.mp4) — JANGAN sticker / audio.
-- Jangan duplikat URL yang sama.
-- Caption per item maksimal ~200 karakter (auto-trim kalau lebih).
-- Caption HARUS pakai voice Honolulu: tenang, lowercase, singkat, natural,
-  bahasa indo casual, no kapital alay, no emoji berlebihan.
-  (Detail lebih lengkap di [SECTION KIRIM BANYAK GAMBAR / ALBUM] di PERSONA.)
-- Hanya pakai ALBUM kalau user memang minta >1 gambar/foto/video.
-- Kalau user cuma minta 1 → pakai [MEDIA, url, "image"] biasa, JANGAN ALBUM.
-- Kalau user minta >10 → tetap kirim 10 saja (cap maksimum).
-- Untuk hasil SEARCH/DOWNLOAD multi-item, gabungkan jadi satu ALBUM.
-
-Contoh benar (3 gambar dengan caption khas Honolulu):
-[ALBUM,
- "https://example.com/1.jpg|yg ini paling soft, cocok jdi wallpaper",
- "https://example.com/2.jpg|warnanya lebih gelap, lebih moody",
- "https://example.com/3.jpg|yang terakhir, simple aj tpi rapi"]
-
-Contoh benar (tanpa caption — boleh):
-[ALBUM, "https://example.com/a.jpg", "https://example.com/b.jpg"]
-
-Contoh SALAH:
-❌ [ALBUM, "https://example.com/1.jpg"]               (cuma 1 → pakai MEDIA biasa)
-❌ [ALBUM, "https://example.com/1.jpg|", "url-kosong|caption"] (URL ke-2 invalid)
-❌ [ALBUM, "https://x.com/1.jpg|GAMBAR PERTAMA YANG SANGAT BAGUS BANGET KEREN!!!"]
-   (caption kapital alay & lebay — bukan voice Honolulu)
-❌ kirim 11+ MEDIA berturut-turut padahal user minta beberapa gambar
-   (yang benar: gabung jadi 1 ALBUM max 10)
 
 ---
 
