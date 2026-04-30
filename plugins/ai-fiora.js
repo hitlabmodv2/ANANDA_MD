@@ -502,28 +502,47 @@ async function fioraResponse(response, conn, m, { startThinking }) {
     if (type === "MEDIA") {
       const [url, mediaType] = value
 
-      if (mediaType === "image" || mediaType === "video") {
-        await conn.sendMessage(
-          m.chat,
-          { [mediaType]: { url } },
-          { quoted: m, messageId: generateFioraID() }
-        )
-      }
+      const isValidUrl = typeof url === "string"
+        && url.trim().length > 0
+        && /^https?:\/\//i.test(url.trim())
 
-      if (mediaType === "sticker") {
-        const { data, mime } = await conn.getFile(url);
-                        const exif = { packName: global.stickpack, packPublish: global.stickauth };
-                        const sticker = await (await import('../lib/exif.js')).writeExif({ mimetype: mime, data }, exif);
-                        await conn.sendMessage(m.chat, { sticker }, { quoted: m, messageId: generateFioraID() });
-                        try { trackStickerUsage(url, m.chat, m.sender); } catch(e) {}
-      }
+      if (!isValidUrl) {
+        console.warn(`[MEDIA] Skipped — URL kosong/invalid (type=${mediaType}, url=${JSON.stringify(url)})`)
+      } else {
+        const cleanUrl = url.trim()
 
-      if (mediaType === "audio") {
-        await conn.sendMessage(
-          m.chat,
-          { audio: { url }, mimetype: "audio/mp4", ptt: false },
-          { quoted: m, messageId: generateFioraID() }
-        )
+        if (mediaType === "image" || mediaType === "video") {
+          await conn.sendMessage(
+            m.chat,
+            { [mediaType]: { url: cleanUrl } },
+            { quoted: m, messageId: generateFioraID() }
+          )
+        }
+
+        if (mediaType === "sticker") {
+          const isOfficial = !!findStickerMeta(cleanUrl)
+          if (!isOfficial) {
+            console.warn(`[STICKER] Skipped — URL tidak ada di daftar resmi: ${cleanUrl}`)
+          } else {
+            try {
+              const { data, mime } = await conn.getFile(cleanUrl);
+              const exif = { packName: global.stickpack, packPublish: global.stickauth };
+              const sticker = await (await import('../lib/exif.js')).writeExif({ mimetype: mime, data }, exif);
+              await conn.sendMessage(m.chat, { sticker }, { quoted: m, messageId: generateFioraID() });
+              try { trackStickerUsage(cleanUrl, m.chat, m.sender); } catch(e) {}
+            } catch (err) {
+              console.warn(`[STICKER] Gagal kirim (${cleanUrl}): ${err?.message || err}`)
+            }
+          }
+        }
+
+        if (mediaType === "audio") {
+          await conn.sendMessage(
+            m.chat,
+            { audio: { url: cleanUrl }, mimetype: "audio/mp4", ptt: false },
+            { quoted: m, messageId: generateFioraID() }
+          )
+        }
       }
     }
 
