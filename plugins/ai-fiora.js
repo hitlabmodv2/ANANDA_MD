@@ -16,11 +16,37 @@ import { spawn } from 'child_process';
 
 function formatStageDirections(t) {
   if (typeof t !== 'string' || !t) return t
-  return t
+  let out = t
     .replace(/(\([^()\n]{1,80}\))\s*/g, '$1\n')
     .replace(/(\*[^*\n]{1,80}\*)\s*/g, '$1\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
+
+  const lines = out.split('\n')
+  const result = []
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    result.push(line)
+    const trimmed = line.trim()
+    const isQuotedAction = /^>\s*\(.*\)\s*$/.test(trimmed)
+    const isPlainAction  = /^\(.*\)\s*$/.test(trimmed)
+    if (isQuotedAction || isPlainAction) {
+      const next = (lines[i + 1] || '').trim()
+      const nextIsAction = /^>\s*\(.*\)\s*$/.test(next) || /^\(.*\)\s*$/.test(next)
+      const nextIsTilde  = next === '~'
+      const nextIsEmpty  = next === ''
+      if (next && !nextIsAction && !nextIsTilde) {
+        result.push('~')
+      } else if (nextIsEmpty) {
+        const after = (lines[i + 2] || '').trim()
+        const afterIsAction = /^>\s*\(.*\)\s*$/.test(after) || /^\(.*\)\s*$/.test(after)
+        if (after && !afterIsAction && after !== '~') {
+          result.push('~')
+        }
+      }
+    }
+  }
+  return result.join('\n').replace(/\n{3,}/g, '\n\n').trim()
 }
 
 const HONOLULU_STICKERS = [
