@@ -1,0 +1,14 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "oj0T-TAyn-5GHLQvUmlub"
+uri = "file://tts_samples/01_google_translate_japanese.mp3"
+type = "audio"
+title = "Sample 1 — Google TTS (Japanese, suara natural)"
+
+[[outputs]]
+id = "w88jnaD_WuF8k9VuO32Ad"
+uri = "file://tts_samples/02_voicevox_zundamon_anime.mp3"
+type = "audio"
+title = "Sample 2 — VoiceVox Zundamon (suara anime asli)"
