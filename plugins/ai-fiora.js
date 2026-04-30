@@ -82,14 +82,20 @@ function trackStickerUsage(url, chatJid, senderJid) {
       perUrl: {},
       perChat: {},
       perSender: {},
+      perChatUrl: {},
       lastUsedAt: 0
     };
   }
   const s = global.db.data.msgs.honolulu_sticker_stats;
+  if (!s.perChatUrl) s.perChatUrl = {};
   s.total = (s.total || 0) + 1;
   s.lastUsedAt = Date.now();
   s.perUrl[url] = (s.perUrl[url] || 0) + 1;
-  if (chatJid)   s.perChat[chatJid]     = (s.perChat[chatJid]     || 0) + 1;
+  if (chatJid) {
+    s.perChat[chatJid] = (s.perChat[chatJid] || 0) + 1;
+    if (!s.perChatUrl[chatJid]) s.perChatUrl[chatJid] = {};
+    s.perChatUrl[chatJid][url] = (s.perChatUrl[chatJid][url] || 0) + 1;
+  }
   if (senderJid) s.perSender[senderJid] = (s.perSender[senderJid] || 0) + 1;
 }
 
@@ -126,13 +132,32 @@ let handler = async (m, { conn, text, usedPrefix, command, groupMetadata, isOwne
     const s = global?.db?.data?.msgs?.honolulu_sticker_stats
     if (!s || !s.total) return m.reply("Belum ada data sticker yang tercatat.")
 
+    const mode = (text || "").trim().toLowerCase()
     const lines = []
     lines.push("📊 *HONOLULU STICKER STATS*")
     lines.push("─".repeat(28))
     lines.push("Total terkirim : " + s.total)
     lines.push("Terakhir pakai : " + (s.lastUsedAt ? new Date(s.lastUsedAt).toLocaleString("id-ID") : "-"))
+
+    const chatStats = s.perChatUrl?.[m.chat] || {}
+    const top3Here = Object.entries(chatStats)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([url, count]) => ({ url, count, meta: findStickerMeta(url) }))
+      .filter(x => x.meta)
+
     lines.push("")
-    lines.push("*Top sticker (per ekspresi):*")
+    lines.push("*Top 3 sticker di chat ini:*")
+    if (!top3Here.length) {
+      lines.push("(belum ada sticker tercatat di chat ini)")
+    } else {
+      top3Here.forEach((x, i) => {
+        lines.push(`${i+1}. #${x.meta.n} ${x.meta.name} — ${x.count}x`)
+      })
+    }
+
+    lines.push("")
+    lines.push("*Top sticker global (per ekspresi):*")
     const ranked = HONOLULU_STICKERS
       .map(st => ({ ...st, count: s.perUrl?.[st.url] || 0 }))
       .sort((a, b) => b.count - a.count)
@@ -142,10 +167,11 @@ let handler = async (m, { conn, text, usedPrefix, command, groupMetadata, isOwne
       idx++
       const pct = ((st.count / s.total) * 100).toFixed(1)
       lines.push(`${idx}. #${st.n} ${st.name} — ${st.count}x (${pct}%)`)
+      if (idx >= 10) break
     }
     if (idx === 0) lines.push("(tidak ada sticker resmi yang tercatat)")
 
-    if (text === "all" || text === "detail") {
+    if (mode === "all" || mode === "detail") {
       const topChats = Object.entries(s.perChat || {})
         .sort((a, b) => b[1] - a[1]).slice(0, 5)
       const topSenders = Object.entries(s.perSender || {})
@@ -161,17 +187,37 @@ let handler = async (m, { conn, text, usedPrefix, command, groupMetadata, isOwne
         lines.push("*Top user (di-respon sticker terbanyak):*")
         topSenders.forEach(([j, c], i) => lines.push(`${i+1}. ${j.replace(/@.+/, "")} — ${c}x`))
       }
-    } else {
+    } else if (mode !== "visual") {
       lines.push("")
-      lines.push(`Tip: ketik *${usedPrefix}${command} all* untuk lihat top chat & user.`)
+      lines.push(`Tip:`)
+      lines.push(`• *${usedPrefix}${command} visual* — kirim preview 3 sticker top di chat ini`)
+      lines.push(`• *${usedPrefix}${command} all* — top chat & top user`)
     }
 
-    return m.reply(lines.join("\n"))
+    await m.reply(lines.join("\n"))
+
+    if (mode === "visual") {
+      if (!top3Here.length) {
+        return m.reply("Belum ada sticker yg tercatat di chat ini, jadi gak ada preview.")
+      }
+      for (const x of top3Here) {
+        try {
+          const { data, mime } = await conn.getFile(x.url)
+          const exif = { packName: global.stickpack, packPublish: global.stickauth }
+          const sticker = await (await import('../lib/exif.js')).writeExif({ mimetype: mime, data }, exif)
+          await conn.sendMessage(m.chat, { sticker }, { quoted: m })
+        } catch (e) {
+          await m.reply(`Gagal preview #${x.meta.n}: ${e?.message || e}`)
+        }
+      }
+    }
+
+    return
 }
         if (command == "honolulustatsreset" || command == "fiorastatsreset") {
     if (!isOwner) return
     if (global.db.data.msgs) global.db.data.msgs.honolulu_sticker_stats = {
-      total: 0, perUrl: {}, perChat: {}, perSender: {}, lastUsedAt: 0
+      total: 0, perUrl: {}, perChat: {}, perSender: {}, perChatUrl: {}, lastUsedAt: 0
     }
     return m.reply("Stats sticker Honolulu sudah direset.")
 }
