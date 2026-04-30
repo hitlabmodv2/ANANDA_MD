@@ -17,6 +17,16 @@
 </p>
 
 <p align="center">
+  <a href="https://replit.com/github/AgusXzz/ChiiMD">
+    <img src="https://replit.com/badge/github/AgusXzz/ChiiMD" alt="Run on Replit" height="50"/>
+  </a>
+</p>
+
+<p align="center">
+  <strong>⚡ Jalankan langsung di Replit dengan satu klik — tidak perlu install apapun!</strong>
+</p>
+
+<p align="center">
   <strong>ChiiBot</strong> adalah bot WhatsApp modern yang dibangun menggunakan <strong><a href="https://github.com/WhiskeySockets/Baileys">Baileys</a></strong> dengan dukungan Multi-Device. Bot ini dirancang untuk memberikan pengalaman yang mudah digunakan, ringan, dan mudah dikembangkan.
 </p>
 
@@ -55,6 +65,30 @@ Bot ini dilengkapi dengan berbagai fitur yang terorganisir dalam plugin untuk me
 ---
 
 ## 🚀 Instalasi & Penggunaan
+
+### ⚡ Cara Tercepat — Jalankan di Replit (1 Klik)
+
+Tidak perlu install Node.js, Git, atau apapun. Cukup klik tombol di bawah dan bot akan langsung tersedia di browser Anda:
+
+<p align="center">
+  <a href="https://replit.com/github/AgusXzz/ChiiMD">
+    <img src="https://replit.com/badge/github/AgusXzz/ChiiMD" alt="Run on Replit" height="50"/>
+  </a>
+</p>
+
+**Langkah singkat di Replit:**
+
+1. Klik tombol **Run on Replit** di atas
+2. Login/Sign up ke akun Replit (gratis)
+3. Tunggu Replit melakukan import & install otomatis
+4. Klik tombol **Run** ▶️ — bot akan langsung jalan
+5. Masukkan pairing code yang muncul di console ke WhatsApp Anda
+
+> 💡 Edit `config.js` di Replit untuk mengubah nomor owner, prefix, dan konfigurasi lainnya sebelum menjalankan bot.
+
+---
+
+### 🖥️ Instalasi Manual (Lokal/VPS)
 
 ### Prasyarat
 
@@ -166,10 +200,10 @@ Anda dapat menyesuaikan berbagai aspek bot melalui file `config.js`:
 
 ```javascript
 module.exports = {
-	owner: ['62xxx'], // Nomor owner
-	prefix: '.', // Prefix command
-	botName: 'ChiiBot',
-	// ... konfigurasi lainnya
+        owner: ['62xxx'], // Nomor owner
+        prefix: '.', // Prefix command
+        botName: 'ChiiBot',
+        // ... konfigurasi lainnya
 };
 ```
 
