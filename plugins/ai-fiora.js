@@ -128,7 +128,7 @@ let handler = async (m, { conn, text, usedPrefix, command, groupMetadata, isOwne
         "DEBUG IS " + (global.db.data.msgs[m.sender].fioradebug ? "ON" : "OFF")
     )
 }
-        if (command == "honolulustats" || command == "fiorastats") {
+        if (command == "honolulustic" || command == "honolulustats" || command == "fiorastats") {
     const s = global?.db?.data?.msgs?.honolulu_sticker_stats
     if (!s || !s.total) return m.reply("Belum ada data sticker yang tercatat.")
 
@@ -214,7 +214,7 @@ let handler = async (m, { conn, text, usedPrefix, command, groupMetadata, isOwne
 
     return
 }
-        if (command == "honolulustatsreset" || command == "fiorastatsreset") {
+        if (command == "honolulusticreset" || command == "honolulustatsreset" || command == "fiorastatsreset") {
     if (!isOwner) return
     if (global.db.data.msgs) global.db.data.msgs.honolulu_sticker_stats = {
       total: 0, perUrl: {}, perChat: {}, perSender: {}, perChatUrl: {}, lastUsedAt: 0
@@ -244,9 +244,9 @@ handler.before = async function(m, { conn, text, usedPrefix, groupMetadata, isOw
                 }
         }
 
-handler.help = ['fiora','ai','honolulustats'];
+handler.help = ['fiora','ai','honolulustic'];
 handler.tags = ['ai'];
-handler.command = /^(fiora.*|honolulustats|honolulustatsreset|ai)$/i;
+handler.command = /^(fiora.*|honolulustic|honolulusticreset|honolulustats|honolulustatsreset|ai)$/i;
 
 export default handler;
 
