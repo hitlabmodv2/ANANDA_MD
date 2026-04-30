@@ -24,24 +24,24 @@ function formatStageDirections(t) {
 }
 
 const HONOLULU_STICKERS = [
-  { n: 1,  name: "malu nutup muka",            url: "https://cdn.ornzora.eu.cc/502784e6-108d-49d7-a981-04083d14ad9a-HONOLULU.webp" },
-  { n: 2,  name: "senyum kecil / lembut",      url: "https://cdn.ornzora.eu.cc/89067324-1a1e-4b51-a379-cdb50e8cd30d-HONOLULU.webp" },
-  { n: 3,  name: "datar / blank stare",        url: "https://cdn.ornzora.eu.cc/91b84f91-7d92-4850-a743-c0554439861d-HONOLULU.webp" },
-  { n: 4,  name: "ceria ringan",               url: "https://cdn.ornzora.eu.cc/873d7ed5-c36c-43d7-a5ba-0d0acfd73eb8-HONOLULU.webp" },
-  { n: 5,  name: "smug / puas dikit",          url: "https://cdn.ornzora.eu.cc/e1ab519c-7a03-4246-8cd9-2cfd623247b8-HONOLULU.webp" },
-  { n: 6,  name: "mikir / skeptis",            url: "https://cdn.ornzora.eu.cc/5baac1a3-ca2b-4749-a08c-5eabfd418e79-HONOLULU.webp" },
-  { n: 7,  name: "kaget positif",              url: "https://cdn.ornzora.eu.cc/4d58a123-ad35-4bb2-9353-8e3e23c6d0c8-HONOLULU.webp" },
-  { n: 8,  name: "malu + gugup",               url: "https://cdn.ornzora.eu.cc/b7df2441-2731-427d-ba44-e88e1f5275e4-HONOLULU.webp" },
-  { n: 9,  name: "jahil / ngejek",             url: "https://cdn.ornzora.eu.cc/6adbf4a3-07ce-47c8-9dbd-31efce9d0dfe-HONOLULU.webp" },
-  { n: 10, name: "malu berat / flustered",     url: "https://cdn.ornzora.eu.cc/9138434c-7338-4f66-9b40-574179b5b072-HONOLULU.webp" },
-  { n: 11, name: "ngamuk lucu",                url: "https://cdn.ornzora.eu.cc/6f805809-c16a-4521-bfdf-92ca7d20c6b4-HONOLULU.webp" },
-  { n: 12, name: "kesel lucu",                 url: "https://cdn.ornzora.eu.cc/997a0eb7-090a-404f-9b47-fa84f136705c-HONOLULU.webp" },
-  { n: 13, name: "datar / males respon",       url: "https://cdn.ornzora.eu.cc/57a1045e-48bb-4535-bece-d7bf5e750943-HONOLULU.webp" },
-  { n: 14, name: "zamn / chaotic",             url: "https://cdn.ornzora.eu.cc/249f7a66-906f-4adc-b78f-eca20e4807b7-HONOLULU.webp" },
-  { n: 15, name: "mikir + sedikit kesel",      url: "https://cdn.ornzora.eu.cc/7fce094a-28c8-443f-8602-9be9518d5369-HONOLULU.webp" },
-  { n: 16, name: "malu berat (sensual)",       url: "https://cdn.ornzora.eu.cc/7c896ced-9e8f-4b06-9dc6-228c6b94208f-HONOLULU.webp" },
-  { n: 17, name: "capek total / drop",         url: "https://cdn.ornzora.eu.cc/390fadb4-0548-4978-8dc3-f4ee398a31e9-HONOLULU.webp" },
-  { n: 18, name: "panik / kewalahan",          url: "https://cdn.ornzora.eu.cc/b92ddde7-eccd-43c7-9536-295f528cd741-HONOLULU.webp" }
+  { n: 1,  name: "malu nutup muka",            url: "https://cdn.ornzora.eu.cc/502784e6-108d-49d7-a981-04083d14ad9a-FIORA.webp" },
+  { n: 2,  name: "senyum kecil / lembut",      url: "https://cdn.ornzora.eu.cc/89067324-1a1e-4b51-a379-cdb50e8cd30d-FIORA.webp" },
+  { n: 3,  name: "datar / blank stare",        url: "https://cdn.ornzora.eu.cc/91b84f91-7d92-4850-a743-c0554439861d-FIORA.webp" },
+  { n: 4,  name: "ceria ringan",               url: "https://cdn.ornzora.eu.cc/873d7ed5-c36c-43d7-a5ba-0d0acfd73eb8-FIORA.webp" },
+  { n: 5,  name: "smug / puas dikit",          url: "https://cdn.ornzora.eu.cc/e1ab519c-7a03-4246-8cd9-2cfd623247b8-FIORA.webp" },
+  { n: 6,  name: "mikir / skeptis",            url: "https://cdn.ornzora.eu.cc/5baac1a3-ca2b-4749-a08c-5eabfd418e79-FIORA.webp" },
+  { n: 7,  name: "kaget positif",              url: "https://cdn.ornzora.eu.cc/4d58a123-ad35-4bb2-9353-8e3e23c6d0c8-FIORA.webp" },
+  { n: 8,  name: "malu + gugup",               url: "https://cdn.ornzora.eu.cc/b7df2441-2731-427d-ba44-e88e1f5275e4-FIORA.webp" },
+  { n: 9,  name: "jahil / ngejek",             url: "https://cdn.ornzora.eu.cc/6adbf4a3-07ce-47c8-9dbd-31efce9d0dfe-FIORA.webp" },
+  { n: 10, name: "malu berat / flustered",     url: "https://cdn.ornzora.eu.cc/9138434c-7338-4f66-9b40-574179b5b072-FIORA.webp" },
+  { n: 11, name: "ngamuk lucu",                url: "https://cdn.ornzora.eu.cc/6f805809-c16a-4521-bfdf-92ca7d20c6b4-FIORA.webp" },
+  { n: 12, name: "kesel lucu",                 url: "https://cdn.ornzora.eu.cc/997a0eb7-090a-404f-9b47-fa84f136705c-FIORA.webp" },
+  { n: 13, name: "datar / males respon",       url: "https://cdn.ornzora.eu.cc/57a1045e-48bb-4535-bece-d7bf5e750943-FIORA.webp" },
+  { n: 14, name: "zamn / chaotic",             url: "https://cdn.ornzora.eu.cc/249f7a66-906f-4adc-b78f-eca20e4807b7-FIORA.webp" },
+  { n: 15, name: "mikir + sedikit kesel",      url: "https://cdn.ornzora.eu.cc/7fce094a-28c8-443f-8602-9be9518d5369-FIORA.webp" },
+  { n: 16, name: "malu berat (sensual)",       url: "https://cdn.ornzora.eu.cc/7c896ced-9e8f-4b06-9dc6-228c6b94208f-FIORA.webp" },
+  { n: 17, name: "capek total / drop",         url: "https://cdn.ornzora.eu.cc/390fadb4-0548-4978-8dc3-f4ee398a31e9-FIORA.webp" },
+  { n: 18, name: "panik / kewalahan",          url: "https://cdn.ornzora.eu.cc/b92ddde7-eccd-43c7-9536-295f528cd741-FIORA.webp" }
 ];
 
 function findStickerMeta(url) {
@@ -502,47 +502,28 @@ async function fioraResponse(response, conn, m, { startThinking }) {
     if (type === "MEDIA") {
       const [url, mediaType] = value
 
-      const isValidUrl = typeof url === "string"
-        && url.trim().length > 0
-        && /^https?:\/\//i.test(url.trim())
+      if (mediaType === "image" || mediaType === "video") {
+        await conn.sendMessage(
+          m.chat,
+          { [mediaType]: { url } },
+          { quoted: m, messageId: generateFioraID() }
+        )
+      }
 
-      if (!isValidUrl) {
-        console.warn(`[MEDIA] Skipped — URL kosong/invalid (type=${mediaType}, url=${JSON.stringify(url)})`)
-      } else {
-        const cleanUrl = url.trim()
+      if (mediaType === "sticker") {
+        const { data, mime } = await conn.getFile(url);
+                        const exif = { packName: global.stickpack, packPublish: global.stickauth };
+                        const sticker = await (await import('../lib/exif.js')).writeExif({ mimetype: mime, data }, exif);
+                        await conn.sendMessage(m.chat, { sticker }, { quoted: m, messageId: generateFioraID() });
+                        try { trackStickerUsage(url, m.chat, m.sender); } catch(e) {}
+      }
 
-        if (mediaType === "image" || mediaType === "video") {
-          await conn.sendMessage(
-            m.chat,
-            { [mediaType]: { url: cleanUrl } },
-            { quoted: m, messageId: generateFioraID() }
-          )
-        }
-
-        if (mediaType === "sticker") {
-          const isOfficial = !!findStickerMeta(cleanUrl)
-          if (!isOfficial) {
-            console.warn(`[STICKER] Skipped — URL tidak ada di daftar resmi: ${cleanUrl}`)
-          } else {
-            try {
-              const { data, mime } = await conn.getFile(cleanUrl);
-              const exif = { packName: global.stickpack, packPublish: global.stickauth };
-              const sticker = await (await import('../lib/exif.js')).writeExif({ mimetype: mime, data }, exif);
-              await conn.sendMessage(m.chat, { sticker }, { quoted: m, messageId: generateFioraID() });
-              try { trackStickerUsage(cleanUrl, m.chat, m.sender); } catch(e) {}
-            } catch (err) {
-              console.warn(`[STICKER] Gagal kirim (${cleanUrl}): ${err?.message || err}`)
-            }
-          }
-        }
-
-        if (mediaType === "audio") {
-          await conn.sendMessage(
-            m.chat,
-            { audio: { url: cleanUrl }, mimetype: "audio/mp4", ptt: false },
-            { quoted: m, messageId: generateFioraID() }
-          )
-        }
+      if (mediaType === "audio") {
+        await conn.sendMessage(
+          m.chat,
+          { audio: { url }, mimetype: "audio/mp4", ptt: false },
+          { quoted: m, messageId: generateFioraID() }
+        )
       }
     }
 
@@ -1843,13 +1824,13 @@ Catatan:
 Aturan khusus type "sticker" (WAJIB):
 - URL HARUS diambil 100% persis dari [LIST STICKER] / [STICKER DECISION MATRIX] di PERSONA
 - DILARANG menebak, memendekkan, atau memodifikasi URL stiker
-- DILARANG mengganti host atau menghapus suffix "-HONOLULU.webp"
+- DILARANG mengganti host atau menghapus suffix "-FIORA.webp"
 - type ditulis "sticker" (huruf kecil)
 - Pilih entri yang paling cocok dengan konteks; jika tidak ada yang pas → JANGAN kirim stiker
 - Patuhi STICKER DECISION MATRIX (max 1 stiker per balasan, jeda 4–5 balasan, dst.)
 
 Contoh benar:
-[MEDIA, "https://cdn.ornzora.eu.cc/873d7ed5-c36c-43d7-a5ba-0d0acfd73eb8-HONOLULU.webp", "sticker"]
+[MEDIA, "https://cdn.ornzora.eu.cc/873d7ed5-c36c-43d7-a5ba-0d0acfd73eb8-FIORA.webp", "sticker"]
 
 ---
 
