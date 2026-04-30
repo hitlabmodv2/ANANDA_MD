@@ -124,7 +124,7 @@ const _0x103202 = _0x4bdf;
 })(_0x47b1, 0xbb74 + -0x27 * 0x31d5 + -0x19d77 * -0x7);
 import './config.js';
 import { createRequire } from 'module';
-import _0x447d04, { join } from 'path';
+import pathMod, { join } from 'path';
 function _0x4bdf(_0x4c49bc, _0x49ec07) {
   _0x4c49bc = _0x4c49bc - (0x8e * -0x18 + 0xb5d + 0x375);
   const _0x56edc7 = _0x47b1();
@@ -147,7 +147,7 @@ import { fileURLToPath, pathToFileURL } from 'url';
 }),
   (global.__dirname = function dirname(_0x7065ad) {
     const _0x15f282 = _0x103202;
-    return _0x447d04.dirname(global.__filename(_0x7065ad, !![]));
+    return pathMod.dirname(global.__filename(_0x7065ad, !![]));
   }),
   (global.__require = function require(_0x4b40c4 = import.meta.url) {
     const _0x1f087e = _0x103202,
@@ -158,17 +158,17 @@ import { fileURLToPath, pathToFileURL } from 'url';
       };
     return _0xab1c6d.ADIZP(createRequire, _0x4b40c4);
   }));
-import _0x286f44 from 'fs';
+import fsMod from 'fs';
 import { spawn } from 'child_process';
 import { tmpdir } from 'os';
 import { format } from 'util';
 import { parentPort } from 'worker_threads';
 import { makeWASocket, protoType, serialize } from './lib/simple.js';
-import _0x1d1cff from 'chalk';
-import _0x586652 from 'pino';
-import _0x1caaef from 'syntax-error';
-import _0x4e3e9e from 'better-sqlite3';
-import _0x25133e from './lib/useSQLite.js';
+import chalkMod from 'chalk';
+import pinoMod from 'pino';
+import syntaxError from 'syntax-error';
+import BetterSqlite from 'better-sqlite3';
+import useSQLiteMod from './lib/useSQLite.js';
 import { Browsers, fetchLatestWaWebVersion, makeCacheableSignalKeyStore } from 'baileys';
 (protoType(), serialize());
 const __dirname = global.__dirname(import.meta.url);
@@ -191,9 +191,9 @@ const __dirname = global.__dirname(import.meta.url);
         RubKs: 'INSERT OR ' + 'IGNORE INT' + 'O database' + ' (id, data' + ') VALUES (' + '1, ?)',
       };
     if (!global.db.sqlite) {
-      const _0x14be4d = _0x447d04.resolve(_0x22b3f8.lgSkz);
-      (_0x286f44.mkdirSync(_0x447d04.dirname(_0x14be4d), { recursive: !![] }),
-        (global.db.sqlite = new _0x4e3e9e(_0x14be4d)),
+      const _0x14be4d = pathMod.resolve(_0x22b3f8.lgSkz);
+      (fsMod.mkdirSync(pathMod.dirname(_0x14be4d), { recursive: !![] }),
+        (global.db.sqlite = new BetterSqlite(_0x14be4d)),
         global.db.sqlite.pragma(_0x22b3f8.TfLkw),
         global.db.sqlite.pragma(_0x22b3f8.bRBYC),
         global.db.sqlite.pragma(_0x22b3f8.uzqwj),
@@ -223,15 +223,15 @@ const __dirname = global.__dirname(import.meta.url);
     else global.db.sqlite.prepare(_0x22b3f8.RubKs).run(JSON.stringify(global.db.data));
   }),
   loadDatabase());
-const { state, saveCreds } = await _0x25133e('sessions'),
+const { state, saveCreds } = await useSQLiteMod('sessions'),
   { version } = await fetchLatestWaWebVersion(),
   connectionOptions = {
     auth: {
       creds: state.creds,
-      keys: makeCacheableSignalKeyStore(state.keys, _0x586652().child({ level: 'fatal', stream: 'store' })),
+      keys: makeCacheableSignalKeyStore(state.keys, pinoMod().child({ level: 'fatal', stream: 'store' })),
     },
     version: version,
-    logger: _0x586652({ level: 'silent' }),
+    logger: pinoMod({ level: 'silent' }),
     browser: Browsers.ubuntu('Edge'),
     generateHighQualityLinkPreview: !![],
     syncFullHistory: ![],
@@ -245,7 +245,7 @@ const { state, saveCreds } = await _0x25133e('sessions'),
   };
 global.conn = makeWASocket(connectionOptions);
 if (!conn.authState.creds.registered) {
-  console.log(_0x1d1cff.bgWhite(_0x1d1cff.blue('Generating' + ' code...')));
+  console.log(chalkMod.bgWhite(chalkMod.blue('Generating' + ' code...')));
   try {
     setTimeout(
       async () => {
@@ -253,15 +253,15 @@ if (!conn.authState.creds.registered) {
         let _0x26986f = await conn['requestPai' + 'ringCode'](global['pairingNum' + 'ber']);
         ((_0x26986f = _0x26986f?.match(/.{1,4}/g)?.join('-') || _0x26986f),
           console.log(
-            _0x1d1cff.black(_0x1d1cff.bgGreen('Your Pairi' + 'ng Code : ')),
-            _0x1d1cff.black(_0x1d1cff.white(_0x26986f))
+            chalkMod.black(chalkMod.bgGreen('Your Pairi' + 'ng Code : ')),
+            chalkMod.black(chalkMod.white(_0x26986f))
           ));
       },
       -0x1 * 0xe81 + -0x16b9 + -0x6fe * -0x7
     );
   } catch (_0x581fd5) {
     (console.log(_0x581fd5),
-      _0x286f44.rmSync('./sessions', { recursive: !![], force: !![] }),
+      fsMod.rmSync('./sessions', { recursive: !![], force: !![] }),
       parentPort['postMessag' + 'e']('restart'));
   }
 }
@@ -2313,9 +2313,9 @@ async function connectionUpdate(_0x59fc6f) {
       lastDisconnect: _0x1228d9,
       isOnline: _0xcab0c2,
     } = _0x59fc6f;
-  if (_0x3d2f34.IDPYH(_0x315415, _0x3d2f34.cSYng)) console.log(_0x1d1cff.redBright(_0x3d2f34.CVluk));
+  if (_0x3d2f34.IDPYH(_0x315415, _0x3d2f34.cSYng)) console.log(chalkMod.redBright(_0x3d2f34.CVluk));
   if (_0x3d2f34.AwvNs(_0x315415, _0x3d2f34.NRlzA)) {
-    console.log(_0x1d1cff.green(_0x3d2f34.pMYjW));
+    console.log(chalkMod.green(_0x3d2f34.pMYjW));
     const _0x2c6d32 = _0x297969;
     (function (_0x13dbc9, _0x26e718) {
       const _0x3d0dff = _0x206ca5,
@@ -7236,31 +7236,31 @@ async function connectionUpdate(_0x59fc6f) {
         )
       ] = () => _0x2c6d32(0x1a47 + 0x57c + 0x3 * -0x98f)));
   }
-  if (_0x3d2f34.IDPYH(_0xcab0c2, !![])) console.log(_0x1d1cff.green(_0x3d2f34.dNtZG));
+  if (_0x3d2f34.IDPYH(_0xcab0c2, !![])) console.log(chalkMod.green(_0x3d2f34.dNtZG));
   else {
-    if (_0x3d2f34.FFuMV(_0xcab0c2, ![])) console.log(_0x1d1cff.red(_0x3d2f34.Epsxw));
+    if (_0x3d2f34.FFuMV(_0xcab0c2, ![])) console.log(chalkMod.red(_0x3d2f34.Epsxw));
   }
-  if (_0x3c2483) console.log(_0x1d1cff.yellow(_0x3d2f34.CivQM));
+  if (_0x3c2483) console.log(chalkMod.yellow(_0x3d2f34.CivQM));
   const _0x33e8c8 = _0x1228d9?.error?.output;
   if (_0x33e8c8?.payload) {
     if (_0x3d2f34.FFuMV(_0x33e8c8.statusCode, -0x1c70 + -0x12c9 + 0x30ca)) {
-      (console.log(_0x1d1cff.red(_0x3d2f34.UcOTI)),
-        _0x286f44.rmSync(_0x3d2f34.kwEDs, { recursive: !![], force: !![] }),
+      (console.log(chalkMod.red(_0x3d2f34.UcOTI)),
+        fsMod.rmSync(_0x3d2f34.kwEDs, { recursive: !![], force: !![] }),
         parentPort['postMessag' + 'e'](_0x3d2f34.oTrLO));
       return;
     } else {
       if (_0x3d2f34.UvqYc(_0x33e8c8.statusCode, 0x3dd + 0x1666 + -0x10 * 0x18b))
-        (console.log(_0x1d1cff.red(_0x3d2f34.tTodc)), process.exit(-0xd * -0x7c + -0x6dc + -0x10 * -0x9));
+        (console.log(chalkMod.red(_0x3d2f34.tTodc)), process.exit(-0xd * -0x7c + -0x6dc + -0x10 * -0x9));
       else {
         if (_0x3d2f34.TmQKk(_0x33e8c8.statusCode, 0x26d8 + -0xc2d + -0x18a8))
-          console.log(_0x1d1cff.yellow(_0x3d2f34.QugNE));
+          console.log(chalkMod.yellow(_0x3d2f34.QugNE));
         else {
           if (_0x3d2f34.iaeFP(_0x33e8c8.statusCode, 0x1343 + -0xc * 0x26f + 0xb9d))
-            console.log(_0x1d1cff.yellow(_0x3d2f34.sGShD));
+            console.log(chalkMod.yellow(_0x3d2f34.sGShD));
           else
             _0x3d2f34.kiGOu(_0x33e8c8.statusCode, 0x8eb * 0x3 + 0x39b * -0x9 + -0x3 * -0x26e)
-              ? console.log(_0x1d1cff.yellow(_0x3d2f34.MXdOl))
-              : console.log(_0x1d1cff.red(_0x33e8c8.payload.message));
+              ? console.log(chalkMod.yellow(_0x3d2f34.MXdOl))
+              : console.log(chalkMod.red(_0x33e8c8.payload.message));
         }
       }
     }
@@ -10724,7 +10724,7 @@ async function filesInit() {
         return _0x169046(_0x2caeda, _0x2f3a7c);
       },
     };
-  for (let _0x597079 of _0x286f44['readdirSyn' + 'c'](pluginFolder).filter(pluginFilter)) {
+  for (let _0x597079 of fsMod['readdirSyn' + 'c'](pluginFolder).filter(pluginFilter)) {
     try {
       let _0x1a2961 = global.__filename(_0x1cd8a3.PXpQz(join, pluginFolder, _0x597079));
       const _0x519fa6 = await import(_0x1a2961);
@@ -10761,11 +10761,11 @@ async function filesInit() {
     if (_0x3899f0.XndgM(pluginFilter, _0x14a62e)) {
       let _0x4bf670 = global.__filename(_0x3899f0.rqxpA(join, pluginFolder, _0x14a62e), !![]);
       if (_0x3899f0.HgivK(_0x14a62e, global.plugins)) {
-        if (_0x286f44.existsSync(_0x4bf670))
+        if (fsMod.existsSync(_0x4bf670))
           conn.logger.info('re - requi' + 're plugin ' + '\x27' + _0x14a62e + '\x27');
         else return (conn.logger.warn('deleted pl' + "ugin '" + _0x14a62e + '\x27'), delete global.plugins[_0x14a62e]);
       } else conn.logger.info('requiring ' + 'new plugin' + '\x20\x27' + _0x14a62e + '\x27');
-      let _0x45ed72 = _0x3899f0.UYCoE(_0x1caaef, _0x286f44['readFileSy' + 'nc'](_0x4bf670), _0x14a62e, {
+      let _0x45ed72 = _0x3899f0.UYCoE(syntaxError, fsMod['readFileSy' + 'nc'](_0x4bf670), _0x14a62e, {
         sourceType: _0x3899f0.ZaLEs,
         allowAwaitOutsideFunction: !![],
       });
@@ -10791,7 +10791,7 @@ async function filesInit() {
     }
   }),
   Object.freeze(global.reload),
-  _0x286f44.watch(pluginFolder, global.reload),
+  fsMod.watch(pluginFolder, global.reload),
   await global['reloadHand' + 'ler']());
 async function _quickTest() {
   const _0x2be66e = _0x103202,
