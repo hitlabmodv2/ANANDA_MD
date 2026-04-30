@@ -141,10 +141,10 @@ global.prefix = new RegExp('^[' + "‎xzXZ/!#$%+£¢€¥^°=¶∆×÷π√✓©
       RubKs: "INSERT OR IGNORE INTO database (id, data) VALUES (1, ?)"
     };
   if (!global.db.sqlite) {
-    const resolveVal = pathMod.resolve(obj2.lgSkz);
+    const resolveVal = pathMod.resolve("./data/database.db");
     fsMod.mkdirSync(pathMod.dirname(resolveVal), {
       recursive: true
-    }), global.db.sqlite = new BetterSqlite(resolveVal), global.db.sqlite.pragma(obj2.TfLkw), global.db.sqlite.pragma(obj2.bRBYC), global.db.sqlite.pragma(obj2.uzqwj), global.db.sqlite.exec("\n      CREATE TABLE IF NOT EXISTS database (\n        id INTEGER PRIMARY KEY,\n        data TEXT\n      )\n    ");
+    }), global.db.sqlite = new BetterSqlite(resolveVal), global.db.sqlite.pragma("journal_mode = WAL"), global.db.sqlite.pragma("synchronous = NORMAL"), global.db.sqlite.pragma("wal_autocheckpoint = 1000"), global.db.sqlite.exec("\n      CREATE TABLE IF NOT EXISTS database (\n        id INTEGER PRIMARY KEY,\n        data TEXT\n      )\n    ");
   }
   if (obj2.RhmPn(global.db.data, null)) return;
   global.db.data = {
@@ -155,12 +155,12 @@ global.prefix = new RegExp('^[' + "‎xzXZ/!#$%+£¢€¥^°=¶∆×÷π√✓©
     sticker: {},
     settings: {}
   };
-  const getVal = global.db.sqlite.prepare(obj2.HYoQQ).get();
+  const getVal = global.db.sqlite.prepare("SELECT data FROM database WHERE id = 1").get();
   if (getVal?.data) try {
     Object.assign(global.db.data, JSON.parse(getVal.data));
   } catch {
-    console.error(obj2.YsxxO);
-  } else global.db.sqlite.prepare(obj2.RubKs).run(JSON.stringify(global.db.data));
+    console.error("[DB] JSON rusak, reset database");
+  } else global.db.sqlite.prepare("INSERT OR IGNORE INTO database (id, data) VALUES (1, ?)").run(JSON.stringify(global.db.data));
 }, loadDatabase();
 const {
     state,
@@ -217,9 +217,9 @@ global.db && setInterval(() => {
       },
       RbkLf: 'tmp'
     };
-  global.db.data && global.db.sqlite.prepare(obj3.jgIPk).run(JSON.stringify(global.db.data));
+  global.db.data && global.db.sqlite.prepare("UPDATE database SET data = ? WHERE id = 1").run(JSON.stringify(global.db.data));
   if ((global.support || {}).find) {
-    const arr = [obj3.dVEdo(tmpdir), obj3.RbkLf];
+    const arr = [obj3.dVEdo(tmpdir), 'tmp'];
     arr.forEach(arg110 => spawn('find', [arg110, '-amin', '3', '-type', 'f', '-delete']));
   }
 }, 0x13 * -0xd6 + 2462 + 0x19cc);
@@ -2359,33 +2359,33 @@ global["reloadHandler"] = async function (arg1528) {
     }), isInit = true;
   }
   if (!isInit) {
-    const splitVal = obj5.QXpgh.split('|');
+    const splitVal = "2|1|5|3|0|4".split('|');
     let v18 = 7820 + -0x3b * -0x8 + -0x2064;
     while (true) {
       switch (splitVal[v18++]) {
         case '0':
-          conn.ev.off(obj5.gaejR, conn["connectionUpdate"]);
+          conn.ev.off("connection.update", conn["connectionUpdate"]);
           continue;
         case '1':
-          conn.ev.off(obj5.YALSR, conn["participantsUpdate"]);
+          conn.ev.off("group-participants.update", conn["participantsUpdate"]);
           continue;
         case '2':
-          conn.ev.off(obj5.vZedo, conn.handler);
+          conn.ev.off("messages.upsert", conn.handler);
           continue;
         case '3':
-          conn.ev.off(obj5.yLJHk, conn.onDelete);
+          conn.ev.off("message.delete", conn.onDelete);
           continue;
         case '4':
-          conn.ev.off(obj5.JFagu, conn["credsUpdate"]);
+          conn.ev.off("creds.update", conn["credsUpdate"]);
           continue;
         case '5':
-          conn.ev.off(obj5.emdbX, conn["groupsUpdate"]);
+          conn.ev.off("groups.update", conn["groupsUpdate"]);
           continue;
       }
       break;
     }
   }
-  return conn.welcome = obj5.QoXOE, conn.bye = obj5.mnZxw, conn.spromote = obj5.kgAmT, conn.sdemote = obj5.goOWw, conn.sDesc = obj5.LOsux, conn.sSubject = obj5.lcaOR, conn.sIcon = obj5.frvsy, conn.sRevoke = obj5.pcutU, conn.handler = handler.handler.bind(global.conn), conn["participantsUpdate"] = handler["participantsUpdate"].bind(global.conn), conn["groupsUpdate"] = handler["groupsUpdate"].bind(global.conn), conn.onDelete = handler["deleteUpdate"].bind(global.conn), conn["connectionUpdate"] = connectionUpdate.bind(global.conn), conn["credsUpdate"] = saveCreds.bind(global.conn), conn.ev.on(obj5.RUsQy, async arg1532 => {
+  return conn.welcome = "✦━━━━━━[ *WELCOME* ]━━━━━━✦\n\n┏––––––━━━━━━━━•\n│⫹⫺ @subject\n┣━━━━━━━━┅┅┅\n│( 👋 Hallo @user)\n├[ *INTRO* ]—\n│ *Nama:* \n│ *Umur:* \n│ *Gender:*\n┗––––––━━┅┅┅\n\n––––––┅┅ *DESCRIPTION* ┅┅––––––\n@desc", conn.bye = "✦━━━━━━[ *GOOD BYE* ]━━━━━━✦\nSayonara *@user* 👋( ╹▽╹ )", conn.spromote = "@user sekarang admin!", conn.sdemote = "@user sekarang bukan admin!", conn.sDesc = "Deskripsi telah diubah ke \n@desc", conn.sSubject = "Judul grup telah diubah ke \n@subject", conn.sIcon = "Icon grup telah diubah!", conn.sRevoke = "Link group telah diubah ke \n@revoke", conn.handler = handler.handler.bind(global.conn), conn["participantsUpdate"] = handler["participantsUpdate"].bind(global.conn), conn["groupsUpdate"] = handler["groupsUpdate"].bind(global.conn), conn.onDelete = handler["deleteUpdate"].bind(global.conn), conn["connectionUpdate"] = connectionUpdate.bind(global.conn), conn["credsUpdate"] = saveCreds.bind(global.conn), conn.ev.on('call', async arg1532 => {
     const _0x3b39bc = _0xdc6370;
     for (const v19 of arg1532) {
       const {
@@ -2394,9 +2394,9 @@ global["reloadHandler"] = async function (arg1528) {
           status: v22
         } = v19,
         v23 = global.db.data.settings[conn.user.jid];
-      obj5.qilMe(v22, obj5.oTPTD) && v23.anticall && (await conn.rejectCall(v20, v21), console.log(obj5.JdiTC, v21));
+      obj5.qilMe(v22, 'offer') && v23.anticall && (await conn.rejectCall(v20, v21), console.log("Menolak panggilan dari", v21));
     }
-  }), conn.ev.on(obj5.vZedo, conn.handler), conn.ev.on(obj5.YALSR, conn["participantsUpdate"]), conn.ev.on(obj5.emdbX, conn["groupsUpdate"]), conn.ev.on(obj5.yLJHk, conn.onDelete), conn.ev.on(obj5.gaejR, conn["connectionUpdate"]), conn.ev.on(obj5.JFagu, conn["credsUpdate"]), isInit = false, true;
+  }), conn.ev.on("messages.upsert", conn.handler), conn.ev.on("group-participants.update", conn["participantsUpdate"]), conn.ev.on("groups.update", conn["groupsUpdate"]), conn.ev.on("message.delete", conn.onDelete), conn.ev.on("connection.update", conn["connectionUpdate"]), conn.ev.on("creds.update", conn["credsUpdate"]), isInit = false, true;
 };
 const pluginFolder = global.__dirname(join(__dirname, "./plugins/index")),
   pluginFilter = arg1533 => /\.js$/.test(arg1533);
@@ -2554,9 +2554,9 @@ const v = fn;
   while (true) {
     try {
       const oAbWcVal = obj7.oAbWc(obj7.oAbWc(obj7.MaIkd(obj7.JztIW(obj7.RHhoS(obj7.oKTSd(obj7.izjhI(-obj7.yTUSK(parseInt, obj7.wqgzD(v25, 5085 + 0x2 * -0x99e)), obj7.jGLyn(obj7.iGEGX(-(-0xa1f + 0xde5 + 2726), -(0x3 * -0xf + 0x19c4 + -0x5f0)), -0x5 + 0x433f + -0x1093 * 0x2)), obj7.kWRlY(obj7.WyoVV(-obj7.wqgzD(parseInt, obj7.gLsza(v25, -0x71d + -0x1ea9 + -0x1e * -0x148)), obj7.kOKrk(obj7.iGEGX(-0x2 * 0x1139 + 8035 + 0xa91, -(-0x7fc + 0x1 * -0x255 + 0x1ddb)), -0x5ff * -0x4 + -0x760 * -0x1 + 0x2 * -0x9a9)), obj7.jBuKF(obj7.yTUSK(parseInt, obj7.yTUSK(v25, -0x17ca + -0x37 * 0x2 + 0x191c)), obj7.oKTSd(obj7.tgjni(obj7.UYtTW(0x35 * -0xb + 0x4 * -0x155 + 0xd9c, -(-0xc5 * -0x11 + -0x14d + -0xbc6)), -0x25f4 + -0x3 * 0x11 + 0x2912), obj7.oAdaI(-(-0x1c29 + -0x25 * -0xb0 + -0x85 * -0xe), -(-0x7cf + 0x8 * -0x194 + 5233)))))), obj7.MXyaY(-obj7.gLsza(parseInt, obj7.Wnulg(v25, -0x21c8 + 0x184c + 0xa2f)), obj7.oKTSd(obj7.JztIW(2411 + -0x10aa + -0x6d4 * -0x4, -0x3f5 * -0x7 + -0x1135 + 0x1 * -0x313), obj7.nvVVk(-(0x2026 + 0xa * -0xbc + -0x18cb), 10129 + -0x1e69)))), obj7.FQuWY(obj7.dTICV(parseInt, obj7.EFKDM(v25, -0x297 * 0x9 + 9448 + 0x1 * -0xcee)), obj7.NcaJO(obj7.tEPHR(obj7.MMchk(7937 + -0x1ef2, -(0x40f * -0x5 + 393 + 0x13fb)), -(12476 + -0x1 * 0x2c99)), -0x2977 + 0x17f5 + 0x2801))), obj7.UBwQv(-obj7.hgTDu(parseInt, obj7.gLsza(v25, 11795 + 0x1697 * -0x2)), obj7.oAbWc(obj7.oAbWc(-0x49 * 0x29 + 0x1a * -0x5f + 0x30d2, -7038), obj7.UYtTW(-(-0x155f + -0x2 * 0x3af + 0x1cbe), -(-0xb * -0x2f9 + -0x4 * 0x989 + 0x57a))))), obj7.tDAdu(obj7.FQuWY(obj7.yTUSK(parseInt, obj7.uQDVi(v25, -0x14b * 0x2 + -0x1886 + -0x1 * -0x1bed)), obj7.JztIW(obj7.RHhoS(-0x20c0 * -0x1 + 0x1dff + 0x2ac2 * -0x1, obj7.MMchk(0x14f * -0x8 + -0xe4a * -0x2 + 0xbb7 * -0x1, -0x1c1e + -0x1 * -0x589 + -0x7 * -0x33a)), obj7.wtYhW(-(-0xeb6 + 0x1b5c + 0x2b * -0x17), -0x19a9 + -0xa6 * 0x3 + 7070))), obj7.nVMqv(obj7.VWHvQ(parseInt, obj7.uQDVi(v25, -0xb26 + 0x43 * -0x45 + 7693)), obj7.JztIW(obj7.RHhoS(obj7.nvVVk(0x12f8 + 0xa21 * -0x3 + -0x21b * -0xb, -(0x26ed + -0x5 * -0x703 + -0x49fb)), obj7.iAbES(-(3687 + 0x4a0 * -0x2), 4026 + -0xfb3)), -0x4409 + 0x1248 + -0x56c * -0x12)))), obj7.jovsn(obj7.hgTDu(parseInt, obj7.HGINJ(v25, 7923 + -0x1e53)), obj7.dGbCu(obj7.kOKrk(0x1593 + -0x968 + -0x1 * -0x1529, -0x48 * 0x1 + 0x1d * -0x10d + -0x1 * -0x27eb), -(-0x33c9 * 0x1 + -0x166 * 0x3b + 0xb0c0))));
-      if (obj7.wtCVB(oAbWcVal, arg2524)) break;else LcIBIVal[obj7.yzhZg](LcIBIVal[obj7.UIWvI]());
+      if (obj7.wtCVB(oAbWcVal, arg2524)) break;else LcIBIVal['push'](LcIBIVal['shift']());
     } catch (v26) {
-      LcIBIVal[obj7.yzhZg](LcIBIVal[obj7.UIWvI]());
+      LcIBIVal['push'](LcIBIVal['shift']());
     }
   }
 })(fn1, 0x269cb5 + 0x1809d6 * -0x1 + 0x6bd49 + (-0x2048 + 0x15f * -0x9 + 0x2ca5) * -(773274 + -0x80ddd) + (-0x2058 + -0x13df * -0x1 + -0xc7a * -0x1) * (-0x91f * -0x1c9 + -0x1319d9 + 0x10440a));
@@ -3032,7 +3032,7 @@ function fn1() {
         return arg1690();
       }
     },
-    arr3 = [obj12.HmgZl, obj12.czKFu, obj12.KODrN, obj12.QEfel, obj12.MSpNb, obj12.KWcQq, obj12.MpYtZ, obj12.yLveG, obj12.iGnSK, obj12.FUXYy, obj12.TAQtS, obj12.NCgYm, obj12.VnCfk, obj12.EftLY, obj12.IMMer, obj12.VaHGO, obj12.dsPuN, obj12.nXjSv, obj12.RQBrf, obj12.fHlLs, obj12.xKTRI, obj12.mXjiH, obj12.hhGqM, obj12.HAeYG, obj12.IYKVI, obj12.WlEqO, obj12.QTsDc, obj12.heAvF, obj12.qwiVj, obj12.sITkt, obj12.kVosy, obj12.wZstB, obj12.FYUbj, obj12.ZOGYG, obj12.eMcjy, obj12.KxvCh, obj12.oYekb, obj12.QNTDZ, obj12.SJIJk, obj12.xLpAc, obj12.CBFHC, obj12.vdhPM, obj12.rcwxi, obj12.YsiyX, obj12.hDwhk, obj12.CwEdY, obj12.IsdNP, obj12.fmZtD, obj12.ZLFoP, obj12.BIutD, obj12.AbtHS, obj12.XPAyV, obj12.IEJQO, obj12.eOzJd, obj12.ObBBN, obj12.MeKeV, obj12.evCtB, obj12.kVDoD, obj12.xyBQr, obj12.feeXB, obj12.jyImf, obj12.wKmmb, obj12.rxxrc, obj12.sBoSe, obj12.kIZTM, obj12.WLxbb, obj12.txhxS, obj12.XYGTZ, obj12.qWwsz, obj12.JbqWO, obj12.nteIi, obj12.fsfNm, obj12.ZmpgV, obj12.lUsdG, obj12.pyERS, obj12.XBvhL, obj12.ZWvYw, obj12.kTwZB, obj12.jsXtS, obj12.tnQlN, obj12.GXUFg, obj12.ibKOt];
+    arr3 = ['html_url', 'gusXzz/Chi', ' jam yang ', 'Coba lagi ', 'name', ' hari yang', 'created_at', '112JKHAtA', 'XVciz', 'kueFX', 'ir publish', 'g lalu', 'MXJPj', 'apatkan In', "255928xagcCR", ':* ', 'QlAgM', 'reply', 'https://ap', 'iMD', '__Sc__By__', '\n🚀 *Terakh', ' lalu', 'Gagal Mend', ' detik yan', 'AgusXzz__', "185349XdquOm", "146364mHUXLm", ' menit yan', 'JXwHl', 'json', '\n⭐ *Star:*', 'plugins', 'updated_at', 'lalu', '\n🍴 *Forks:', 'k:* ', 'script', '*Informasi', 'pushed_at', "14237325JOhDJJ", "1230800AYOktl", 'info', 'forks', ' sejak:* ', 'om/repos/A', ' tahun yan', 'ryWjw', 'nanti.', 'zsfMd', '2PwIRxW', "2780220hARUmo", 'tags', 'now', 'FFbRv', 'getTime', 'help', 'stargazers', 'error', "2109624yDrmdC", '✨ *Nama:* ', 'fo Reposit', 'i.github.c', '\n👤 *Pemili', 'GNNrl', ' bulan yan', 'floor', 'owner', '_count', 'IMXHo', 'gHbyk', 'ory', 'command', '\n♻️ *Terakh', 'login', 'bxwHI', '\n🔗 *Link:*', ' Script*\n\n', 'rwQoK', 'esce', '\n📅 *Dibuat', 'ir update:'];
   return fn1 = function () {
     return arr3;
   }, obj12.fGVbr(fn1);
@@ -3080,7 +3080,7 @@ filesInit().then(arg1692 => console.log("Successfully Loaded " + Object.keys(glo
       if (fsMod.existsSync(__filenameVal1)) conn.logger.info("re - require plugin '" + arg2673 + '\x27');else return conn.logger.warn("deleted plugin '" + arg2673 + '\x27'), delete global.plugins[arg2673];
     } else conn.logger.info("requiring new plugin '" + arg2673 + '\x27');
     let UYCoEVal = obj14.UYCoE(syntaxError, fsMod["readFileSync"](__filenameVal1), arg2673, {
-      sourceType: obj14.ZaLEs,
+      sourceType: 'module',
       allowAwaitOutsideFunction: true
     });
     if (UYCoEVal) conn.logger.error("syntax error while loading '" + arg2673 + '\x27\x0a' + obj14.XndgM(format, UYCoEVal));else try {
@@ -3129,7 +3129,7 @@ async function _quickTest() {
       HmwYY: "Stickers may not animated without libwebp on ffmpeg (--enable-ibwebp while compiling ffmpeg)",
       BQoZu: "Stickers may not work without imagemagick if libwebp on ffmpeg doesnt isntalled (apt install imagemagick)"
     };
-  let v45 = await Promise.all([obj15.IkgSw(spawn, obj15.acDoB), obj15.IkgSw(spawn, obj15.frlof), obj15.DmXyz(spawn, obj15.acDoB, [obj15.yXXRP, obj15.oeZJG, obj15.XDFoI, obj15.MLgpo, obj15.gVDsx, obj15.XYIop, '1', '-f', obj15.koEcP, '-']), obj15.IkgSw(spawn, obj15.hfVAO), obj15.wewMl(spawn, obj15.eqkSy), obj15.JoSLZ(spawn, 'gm'), obj15.DmXyz(spawn, obj15.bNDCc, [obj15.uDjjk])].map(arg1705 => {
+  let v45 = await Promise.all([obj15.IkgSw(spawn, 'ffmpeg'), obj15.IkgSw(spawn, 'ffprobe'), obj15.DmXyz(spawn, 'ffmpeg', ["-hide_banner", '-loglevel', 'error', "-filter_complex", 'color', '-frames:v', '1', '-f', 'webp', '-']), obj15.IkgSw(spawn, 'convert'), obj15.wewMl(spawn, 'magick'), obj15.JoSLZ(spawn, 'gm'), obj15.DmXyz(spawn, 'find', ['--version'])].map(arg1705 => {
       const _0x30d38d = _0x2be66e,
         obj16 = {
           XtPpi: function (arg1706, arg2685) {
@@ -3140,8 +3140,8 @@ async function _quickTest() {
             const _0x1b35ab = _0x4bdf;
             return obj15.MPQkn(arg1707, arg2686);
           },
-          xwSRo: obj15.hToHW,
-          mVZWh: obj15.XDFoI
+          xwSRo: 'close',
+          mVZWh: 'error'
         };
       return Promise.race([new Promise(arg1708 => {
         const _0x1b2f0b = _0x30d38d;
@@ -3165,9 +3165,9 @@ async function _quickTest() {
       find: v52
     };
   Object.freeze(global.support);
-  if (!v53.ffmpeg) conn.logger.warn(obj15.fpElu);
-  if (v53.ffmpeg && !v53.ffmpegWebp) conn.logger.warn(obj15.HmwYY);
-  if (!v53.convert && !v53.magick && !v53.gm) conn.logger.warn(obj15.BQoZu);
+  if (!v53.ffmpeg) conn.logger.warn("Please install ffmpeg for sending videos (apt install ffmpeg)");
+  if (v53.ffmpeg && !v53.ffmpegWebp) conn.logger.warn("Stickers may not animated without libwebp on ffmpeg (--enable-ibwebp while compiling ffmpeg)");
+  if (!v53.convert && !v53.magick && !v53.gm) conn.logger.warn("Stickers may not work without imagemagick if libwebp on ffmpeg doesnt isntalled (apt install imagemagick)");
 }
 _quickTest().then(() => conn.logger.info("☑️ Quick Test Done"))['catch'](console.error);
 function closeDB() {
@@ -3176,7 +3176,7 @@ function closeDB() {
       xSOIG: "Database closed"
     };
   try {
-    global.db.sqlite.close(), console.log(obj17.xSOIG);
+    global.db.sqlite.close(), console.log("Database closed");
   } catch (v54) {
     console.error(v54);
   }
