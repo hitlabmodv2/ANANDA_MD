@@ -1,34 +1,47 @@
-<p align="center">
-  <img src="media/thumbnail.jpg" alt="ChiiBot Banner" width="400"/>
+<div align="center">
+
+<img src="media/thumbnail.jpg" alt="ChiiBot Banner" width="320" style="border-radius: 16px;"/>
+
+<br/>
+
+<a href="https://replit.com/github/AgusXzz/ChiiMD">
+  <img src="https://replit.com/badge/github/AgusXzz/ChiiMD" alt="Run on Replit" height="45"/>
+</a>
+
+<h1>🌙 ChiiBot</h1>
+
+<p><em>Bot WhatsApp Multi-Device — Ringan, Modern, dan Mudah Dikembangkan</em></p>
+
+<p>
+  <a href="https://github.com/AgusXzz/ChiiMD/stargazers"><img src="https://img.shields.io/github/stars/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=ffc107&labelColor=1a1a2e" alt="Stars"></a>
+  <a href="https://github.com/AgusXzz/ChiiMD/network/members"><img src="https://img.shields.io/github/forks/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=9c27b0&labelColor=1a1a2e" alt="Forks"></a>
+  <a href="https://github.com/AgusXzz/ChiiMD/issues"><img src="https://img.shields.io/github/issues/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=ef4444&labelColor=1a1a2e" alt="Issues"></a>
+  <a href="https://github.com/AgusXzz/ChiiMD/blob/main/LICENSE"><img src="https://img.shields.io/github/license/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=3b82f6&labelColor=1a1a2e" alt="License"></a>
 </p>
 
-<h1 align="center">ChiiBot - Bot WhatsApp Multi-Device</h1>
-
-<p align="center">
-  <a href="https://github.com/AgusXzz/ChiiMD"><img src="https://img.shields.io/github/stars/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=ffc107" alt="Stars"></a>
-  <a href="https://github.com/AgusXzz/ChiiMD/network/members"><img src="https://img.shields.io/github/forks/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=9c27b0" alt="Forks"></a>
-  <a href="https://github.com/AgusXzz/ChiiMD/issues"><img src="https://img.shields.io/github/issues/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=red" alt="Issues"></a>
-  <a href="https://github.com/AgusXzz/ChiiMD/blob/main/LICENSE"><img src="https://img.shields.io/github/license/AgusXzz/ChiiMD?style=for-the-badge&logo=github&color=blue" alt="License"></a>
+<p>
+  <a href="https://chat.whatsapp.com/ELDiJRVGKAk5BpQ0o9cSr9?mode=hqrc"><img src="https://img.shields.io/badge/GROUP%20WHATSAPP-25D366?style=for-the-badge&logo=whatsapp&logoColor=white&labelColor=1a1a2e" alt="Group WhatsApp"></a>
+  <a href="https://whatsapp.com/channel/0029Vb5rT77Ae5Vqi7s27P3L"><img src="https://img.shields.io/badge/CHANNEL%20WHATSAPP-25D366?style=for-the-badge&logo=whatsapp&logoColor=white&labelColor=1a1a2e" alt="Channel WhatsApp"></a>
 </p>
 
-<p align="center">
-  <a href="https://chat.whatsapp.com/ELDiJRVGKAk5BpQ0o9cSr9?mode=hqrc"><img src="https://img.shields.io/badge/GROUP%20WHATSAPP-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Group WhatsApp"></a>
-  <a href="https://whatsapp.com/channel/0029Vb5rT77Ae5Vqi7s27P3L"><img src="https://img.shields.io/badge/CHANNEL%20WHATSAPP-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Channel WhatsApp"></a>
+<table>
+<tr>
+<td align="center">
+
+### ⚡ One-Click Deploy
+
+Tidak perlu install apapun. Cukup klik tombol **Run on Replit** di atas, login, dan bot langsung jalan di browser.
+
+</td>
+</tr>
+</table>
+
+<p>
+  <strong>ChiiBot</strong> dibangun menggunakan <a href="https://github.com/WhiskeySockets/Baileys"><strong>Baileys</strong></a> dengan dukungan Multi-Device.<br/>
+  Dirancang untuk memberikan pengalaman yang <em>mudah digunakan</em>, <em>ringan</em>, dan <em>mudah dikembangkan</em>.
 </p>
 
-<p align="center">
-  <a href="https://replit.com/github/AgusXzz/ChiiMD">
-    <img src="https://replit.com/badge/github/AgusXzz/ChiiMD" alt="Run on Replit" height="50"/>
-  </a>
-</p>
-
-<p align="center">
-  <strong>⚡ Jalankan langsung di Replit dengan satu klik — tidak perlu install apapun!</strong>
-</p>
-
-<p align="center">
-  <strong>ChiiBot</strong> adalah bot WhatsApp modern yang dibangun menggunakan <strong><a href="https://github.com/WhiskeySockets/Baileys">Baileys</a></strong> dengan dukungan Multi-Device. Bot ini dirancang untuk memberikan pengalaman yang mudah digunakan, ringan, dan mudah dikembangkan.
-</p>
+</div>
 
 ---
 
