@@ -29,7 +29,7 @@ let handler = async (m, { conn, text }) => {
 
                 const type = await fileTypeFromBuffer(media);
                 const ext = type?.ext || 'webp';
-                const filename = `SURL_${Date.now()}.${ext}`;
+                const filename = `HONOLULU.${ext}`;
 
                 const form = new FormData();
                 form.append('file', media, { filename });
