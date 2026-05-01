@@ -332,15 +332,39 @@ export async function participantsUpdate({ id, participants, action, simulate = 
                 case 'demote':
                         for (let users of participants) {
                                 let user = this.getJid(users?.phoneNumber || users.id);
-                                text = (
-                                        action === 'promote'
-                                                ? chat.sPromote || this.spromote || conn.spromote || '@user ```is now Admin```'
-                                                : chat.sDemote || this.sdemote || conn.sdemote || '@user ```is no longer Admin```'
-                                )
-                                        .replace('@user', '@' + user.split('@')[0])
-                                        .replace('@subject', this.getName(id))
-                                        .replace('@desc', groupMetadata.desc || '');
-                                if (chat.detect) this.sendMessage(id, { text, mentions: this.parseMention(text) });
+
+                                const isBotAffected = user === this.user.jid;
+
+                                if (isBotAffected) {
+                                        const promoteLines = [
+                                                `...eh, aku jadi admin?\nya udah, aku terima. tapi jangan harap aku bakal tiba-tiba jadi baik sama semua orang di sini.`,
+                                                `hm. dipercaya jadi admin toh.\nbukan berarti aku seneng ya. emang harusnya gini kok.`,
+                                                `...fine. aku admin sekarang.\nkalau ada yang aneh-aneh di grup ini, aku yang urus. jangan bikin repot.`,
+                                                `jadi admin tuh tanggung jawab, tau ga.\nya udah, aku pegang. bukan karena aku mau — emang harusnya.`,
+                                                `dikasih admin? oke.\naku ga akan sia-siain, tapi juga jangan dikira aku bakal jungkir balik ngurusin semua orang.`,
+                                        ];
+                                        const demoteLines = [
+                                                `di-non-adminkan?\nya terserah. aku juga ga nganggep jabatan itu penting-penting banget sih.`,
+                                                `oh, aku bukan admin lagi? oke.\nga ada bedanya juga buat aku. tetap di sini kok.`,
+                                                `hm. ya udah.\nemang dari awal aku ga butuh titel admin juga. grup ini tetap bisa aku perhatiin.`,
+                                                `dicabut adminnya?\nfine. aku juga udah kenyang ngurusin grup ini kok. santai aja.`,
+                                                `bukan admin lagi? oke, aku catat.\nbukan berarti aku pergi ya. masih di sini — cuma ga punya akses aja sekarang.`,
+                                        ];
+
+                                        const lines = action === 'promote' ? promoteLines : demoteLines;
+                                        const picked = lines[Math.floor(Math.random() * lines.length)];
+                                        this.sendMessage(id, { text: picked });
+                                } else {
+                                        text = (
+                                                action === 'promote'
+                                                        ? chat.sPromote || this.spromote || conn.spromote || '@user ```is now Admin```'
+                                                        : chat.sDemote || this.sdemote || conn.sdemote || '@user ```is no longer Admin```'
+                                        )
+                                                .replace('@user', '@' + user.split('@')[0])
+                                                .replace('@subject', this.getName(id))
+                                                .replace('@desc', groupMetadata.desc || '');
+                                        if (chat.detect) this.sendMessage(id, { text, mentions: this.parseMention(text) });
+                                }
                         }
                         break;
         }
