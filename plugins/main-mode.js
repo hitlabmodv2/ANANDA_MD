@@ -8,10 +8,28 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                 !s.public ? 'self' : s.gconly ? 'gc' : s.pconly ? 'pc' : 'public';
 
         const modeInfo = {
-                public: { label: '🌐 PUBLIC', desc: 'Semua orang — private & grup' },
-                self:   { label: '🔒 SELF',   desc: 'Owner saja — private & grup' },
-                gc:     { label: '👥 GROUP',  desc: 'Semua orang — grup saja' },
-                pc:     { label: '💬 PRIVATE', desc: 'Semua orang — private saja' },
+                public: { label: '🌐 PUBLIC',  desc: 'Semua orang, private & grup aktif' },
+                self:   { label: '🔒 SELF',    desc: 'Owner saja, private & grup aktif' },
+                gc:     { label: '👥 GROUP',   desc: 'Semua orang, khusus grup saja' },
+                pc:     { label: '💬 PRIVATE', desc: 'Semua orang, khusus private saja' },
+        };
+
+        const buildStatusPanel = (activeMode) => {
+                const lines = Object.entries(modeInfo).map(([key, info]) => {
+                        const isActive = key === activeMode;
+                        return `${isActive ? '✅' : '☑️'} ${info.label} ${isActive ? '*(aktif)*' : ''}\n   └ ${info.desc}`;
+                });
+                return (
+                        `╔══ 𝙼𝙾𝙳𝙴 𝙱𝙾𝚃 ══╗\n\n` +
+                        lines.join('\n\n') +
+                        `\n\n╚══════════════╝\n\n` +
+                        `*Command:*\n` +
+                        `- ${usedPrefix}mode public → aktifkan PUBLIC\n` +
+                        `- ${usedPrefix}mode self   → aktifkan SELF\n` +
+                        `- ${usedPrefix}mode gc     → aktifkan GROUP\n` +
+                        `- ${usedPrefix}mode pc     → aktifkan PRIVATE\n` +
+                        `- ${usedPrefix}mode status → cek mode sekarang`
+                );
         };
 
         const prevMode = getCurrentMode(settings);
@@ -19,63 +37,67 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
         switch (type) {
                 case 'all':
                 case 'public': {
-                        if (prevMode === 'public') return m.reply(`⚠️ Mode *PUBLIC* sudah aktif sebelumnya.`);
-                        settings.public = true;
-                        settings.gconly = false;
-                        settings.pconly = false;
+                        const alreadyActive = prevMode === 'public';
+                        if (!alreadyActive) {
+                                settings.public = true;
+                                settings.gconly = false;
+                                settings.pconly = false;
+                        }
                         m.reply(
-                                `✅ Mode berhasil diubah!\n\n` +
-                                `▸ Sebelumnya : ${modeInfo[prevMode].label}\n` +
-                                `▸ Sekarang   : ${modeInfo['public'].label}\n\n` +
-                                `- Siapa: semua orang\n` +
-                                `- Tempat: private chat & grup`
+                                (alreadyActive
+                                        ? `ℹ️ Mode *PUBLIC* sudah aktif sebelumnya, tidak ada perubahan.\n\n`
+                                        : `✅ Mode berhasil diubah!\n▸ Sebelumnya : ${modeInfo[prevMode].label}\n▸ Sekarang   : ${modeInfo['public'].label}\n\n`) +
+                                buildStatusPanel('public')
                         );
                         break;
                 }
 
                 case 'self': {
-                        if (prevMode === 'self') return m.reply(`⚠️ Mode *SELF* sudah aktif sebelumnya.`);
-                        settings.public = false;
-                        settings.gconly = false;
-                        settings.pconly = false;
+                        const alreadyActive = prevMode === 'self';
+                        if (!alreadyActive) {
+                                settings.public = false;
+                                settings.gconly = false;
+                                settings.pconly = false;
+                        }
                         m.reply(
-                                `✅ Mode berhasil diubah!\n\n` +
-                                `▸ Sebelumnya : ${modeInfo[prevMode].label}\n` +
-                                `▸ Sekarang   : ${modeInfo['self'].label}\n\n` +
-                                `- Siapa: owner saja\n` +
-                                `- Tempat: private chat & grup`
+                                (alreadyActive
+                                        ? `ℹ️ Mode *SELF* sudah aktif sebelumnya, tidak ada perubahan.\n\n`
+                                        : `✅ Mode berhasil diubah!\n▸ Sebelumnya : ${modeInfo[prevMode].label}\n▸ Sekarang   : ${modeInfo['self'].label}\n\n`) +
+                                buildStatusPanel('self')
                         );
                         break;
                 }
 
                 case 'group':
                 case 'gc': {
-                        if (prevMode === 'gc') return m.reply(`⚠️ Mode *GROUP (GC)* sudah aktif sebelumnya.`);
-                        settings.public = true;
-                        settings.gconly = true;
-                        settings.pconly = false;
+                        const alreadyActive = prevMode === 'gc';
+                        if (!alreadyActive) {
+                                settings.public = true;
+                                settings.gconly = true;
+                                settings.pconly = false;
+                        }
                         m.reply(
-                                `✅ Mode berhasil diubah!\n\n` +
-                                `▸ Sebelumnya : ${modeInfo[prevMode].label}\n` +
-                                `▸ Sekarang   : ${modeInfo['gc'].label}\n\n` +
-                                `- Siapa: semua orang\n` +
-                                `- Tempat: grup saja (private diabaikan)`
+                                (alreadyActive
+                                        ? `ℹ️ Mode *GROUP (GC)* sudah aktif sebelumnya, tidak ada perubahan.\n\n`
+                                        : `✅ Mode berhasil diubah!\n▸ Sebelumnya : ${modeInfo[prevMode].label}\n▸ Sekarang   : ${modeInfo['gc'].label}\n\n`) +
+                                buildStatusPanel('gc')
                         );
                         break;
                 }
 
                 case 'private':
                 case 'pc': {
-                        if (prevMode === 'pc') return m.reply(`⚠️ Mode *PRIVATE (PC)* sudah aktif sebelumnya.`);
-                        settings.public = true;
-                        settings.gconly = false;
-                        settings.pconly = true;
+                        const alreadyActive = prevMode === 'pc';
+                        if (!alreadyActive) {
+                                settings.public = true;
+                                settings.gconly = false;
+                                settings.pconly = true;
+                        }
                         m.reply(
-                                `✅ Mode berhasil diubah!\n\n` +
-                                `▸ Sebelumnya : ${modeInfo[prevMode].label}\n` +
-                                `▸ Sekarang   : ${modeInfo['pc'].label}\n\n` +
-                                `- Siapa: semua orang\n` +
-                                `- Tempat: private saja (grup diabaikan)`
+                                (alreadyActive
+                                        ? `ℹ️ Mode *PRIVATE (PC)* sudah aktif sebelumnya, tidak ada perubahan.\n\n`
+                                        : `✅ Mode berhasil diubah!\n▸ Sebelumnya : ${modeInfo[prevMode].label}\n▸ Sekarang   : ${modeInfo['pc'].label}\n\n`) +
+                                buildStatusPanel('pc')
                         );
                         break;
                 }
@@ -84,17 +106,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                 case 'info':
                 case '':
                 default: {
-                        const cur = modeInfo[prevMode];
-                        m.reply(
-                                `*Mode Bot Saat Ini:* ${cur.label}\n` +
-                                `*Keterangan:* ${cur.desc}\n\n` +
-                                `*Pilihan mode:*\n` +
-                                `- ${usedPrefix}mode public → semua orang, private & grup\n` +
-                                `- ${usedPrefix}mode self   → owner saja, private & grup\n` +
-                                `- ${usedPrefix}mode gc     → semua orang, grup saja\n` +
-                                `- ${usedPrefix}mode pc     → semua orang, private saja\n` +
-                                `- ${usedPrefix}mode status → cek mode sekarang`
-                        );
+                        m.reply(buildStatusPanel(prevMode));
                         break;
                 }
         }
