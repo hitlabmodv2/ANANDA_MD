@@ -97,46 +97,15 @@ setup_token() {
     if [ -z "$input_tok" ] || echo "$input_tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
       echo "" >&2
       echo -e "  ${C_RED}❌ Token tidak valid / kosong. Script berhenti.${C_RESET}" >&2
-      echo -e "  ${C_DIM}   Jalankan lagi: push${C_RESET}" >&2
+      echo -e "  ${C_DIM}   Jalankan lagi: bash push.sh${C_RESET}" >&2
       exit 1
     fi
-
-    # ── Validasi token ke GitHub API sebelum disimpan ──
-    echo "" >&2
-    echo -e "  ${C_DIM}🔍 Memvalidasi token ke GitHub...${C_RESET}" >&2
-    local val_http val_user val_scopes
-    val_http=$(curl -s -o /tmp/_gh_val.json -w "%{http_code}" \
-      -H "Authorization: token ${input_tok}" \
-      -H "Accept: application/vnd.github+json" \
-      -D /tmp/_gh_val_headers.txt \
-      "https://api.github.com/user" 2>/dev/null)
-
-    if [ "$val_http" = "200" ]; then
-      val_user=$(grep -o '"login":"[^"]*"' /tmp/_gh_val.json 2>/dev/null | head -1 | sed 's/"login":"//;s/"//')
-      val_scopes=$(grep -i '^x-oauth-scopes:' /tmp/_gh_val_headers.txt 2>/dev/null | sed 's/^[^:]*: //;s/\r//')
-      echo -e "  ${C_GREEN}✅ Token valid!${C_RESET} Login sebagai: ${C_BOLD}${val_user}${C_RESET}" >&2
-      if echo "$val_scopes" | grep -q "repo"; then
-        echo -e "  ${C_GREEN}✅ Scope 'repo' aktif — siap push${C_RESET}" >&2
-      else
-        echo -e "  ${C_YELLOW}⚠️  Scope 'repo' tidak ditemukan (scope: ${val_scopes:-kosong})${C_RESET}" >&2
-        echo -e "  ${C_DIM}   Push mungkin gagal. Buat token baru dengan centang 'repo'.${C_RESET}" >&2
-      fi
-    elif [ "$val_http" = "401" ]; then
-      echo -e "  ${C_RED}❌ Token TIDAK VALID — GitHub menolak (401 Unauthorized)${C_RESET}" >&2
-      echo -e "  ${C_DIM}   Pastikan token benar, tidak expired, dan tidak di-revoke.${C_RESET}" >&2
-      rm -f /tmp/_gh_val.json /tmp/_gh_val_headers.txt
-      echo -e "  ${C_DIM}   Jalankan lagi: push${C_RESET}" >&2
-      exit 1
-    else
-      echo -e "  ${C_YELLOW}⚠️  Tidak bisa cek token (HTTP ${val_http}) — lanjut tanpa validasi${C_RESET}" >&2
-    fi
-    rm -f /tmp/_gh_val.json /tmp/_gh_val_headers.txt
 
     # Simpan ke .token.secret
     printf '%s' "$input_tok" > .token.secret
     echo "" >&2
     echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
-    echo -e "  ${C_GREEN}✅ Token disimpan ke .token.secret${C_RESET}" >&2
+    echo -e "  ${C_GREEN}✅ Token berhasil disimpan ke .token.secret${C_RESET}" >&2
     echo -e "  ${C_DIM}   File ini gitignored — aman, tidak ke-upload ke GitHub${C_RESET}" >&2
     echo "" >&2
     sleep 1
