@@ -8,6 +8,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                 case 'public':
                         settings.public = true;
                         settings.gconly = false;
+                        settings.pconly = false;
                         m.reply(
                                 `✅ *Mode PUBLIC* aktif\n\n` +
                                 `- Bot respon ke semua orang\n` +
@@ -18,6 +19,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                 case 'self':
                         settings.public = false;
                         settings.gconly = false;
+                        settings.pconly = false;
                         m.reply(
                                 `✅ *Mode SELF* aktif\n\n` +
                                 `- Bot hanya respon ke owner\n` +
@@ -29,10 +31,23 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                 case 'gc':
                         settings.public = true;
                         settings.gconly = true;
+                        settings.pconly = false;
                         m.reply(
                                 `✅ *Mode GROUP* aktif\n\n` +
                                 `- Bot respon ke semua orang\n` +
                                 `- Khusus Grup saja (private diabaikan)`
+                        );
+                        break;
+
+                case 'private':
+                case 'pc':
+                        settings.public = true;
+                        settings.gconly = false;
+                        settings.pconly = true;
+                        m.reply(
+                                `✅ *Mode PRIVATE* aktif\n\n` +
+                                `- Bot respon ke semua orang\n` +
+                                `- Khusus Private saja (grup diabaikan)`
                         );
                         break;
 
@@ -44,20 +59,23 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                                 ? '🔒 SELF'
                                 : settings.gconly
                                         ? '👥 GROUP'
-                                        : '🌐 PUBLIC';
+                                        : settings.pconly
+                                                ? '💬 PRIVATE'
+                                                : '🌐 PUBLIC';
                         m.reply(
                                 `*Mode Bot Saat Ini:* ${modeLabel}\n\n` +
                                 `*Pilihan mode:*\n` +
-                                `- ${usedPrefix}mode public → semua orang, private + grup\n` +
-                                `- ${usedPrefix}mode self   → owner only, private + grup\n` +
-                                `- ${usedPrefix}mode group  → semua orang, grup saja\n` +
-                                `- ${usedPrefix}mode status → cek mode sekarang`
+                                `- ${usedPrefix}mode public  → semua orang, private + grup\n` +
+                                `- ${usedPrefix}mode self    → owner only, private + grup\n` +
+                                `- ${usedPrefix}mode gc      → semua orang, grup saja\n` +
+                                `- ${usedPrefix}mode pc      → semua orang, private saja\n` +
+                                `- ${usedPrefix}mode status  → cek mode sekarang`
                         );
                         break;
         }
 };
 
-handler.help = ['mode <public|self|group|status>'];
+handler.help = ['mode <public|self|gc|pc|status>'];
 handler.tags = ['main'];
 handler.command = /^mode$/i;
 

@@ -33,6 +33,7 @@ export async function handler(chatUpdate) {
                 const isPrems = isROwner || db.data.users[m.sender]?.premiumTime > 0;
 
                 if (global.db.data.settings[this.user.jid].gconly && !m.isGroup && !isOwner && !isPrems) { _blocked = true; return; }
+                if (global.db.data.settings[this.user.jid].pconly && m.isGroup && !isOwner) { _blocked = true; return; }
                 if (!global.db.data.settings[this.user.jid].public && !isOwner && !m.fromMe) { _blocked = true; return; }
                 
                 if(await nsfwchecker(m, conn)) return
