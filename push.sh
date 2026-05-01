@@ -32,7 +32,7 @@ USER="hitlabmodv2"
 REPO="ANANDA_MD"
 # DEFAULT_BRANCH di-auto-detect realtime dari GitHub (lihat detect_default_branch).
 # Nilai di sini cuma fallback kalau koneksi ke GitHub bermasalah.
-DEFAULT_BRANCH="main"
+DEFAULT_BRANCH="HONOLULU_AI_V1_2_TSUNDERE"
 
 # Branch yang disembunyikan dari menu (system / internal).
 # Pisahkan dengan spasi. Contoh: "replit-agent gh-pages backup"
