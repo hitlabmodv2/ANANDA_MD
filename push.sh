@@ -38,6 +38,14 @@ DEFAULT_BRANCH="HONOLULU_AI_V1_2_TSUNDERE"
 # Pisahkan dengan spasi. Contoh: "replit-agent gh-pages backup"
 IGNORE_BRANCHES="replit-agent HEAD"
 
+# ── OAuth Device Flow ──
+# Isi dengan Client ID dari GitHub OAuth App kamu.
+# Cara buat (gratis, sekali):
+#   1. Buka https://github.com/settings/developers → "New OAuth App"
+#   2. Isi nama bebas, Homepage URL bebas, callback URL: http://localhost
+#   3. Klik Register → copy Client ID → paste di bawah
+GH_OAUTH_CLIENT_ID=""
+
 set -o pipefail
 # Catatan: sengaja TIDAK pakai `set -e` biar error per-branch nggak
 # langsung kill seluruh script — biar bisa kembali ke menu.
@@ -204,6 +212,133 @@ screen_manual_token() {
   echo "$input_tok"
 }
 
+# ===== Device Flow — token muncul otomatis di terminal =====
+# Tidak perlu script buka browser. User hanya buka URL pendek & masukkan kode.
+# Butuh GH_OAUTH_CLIENT_ID diisi di atas.
+screen_device_flow() {
+  clear 2>/dev/null || true
+  echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}" >&2
+  echo -e "${C_BOLD}║     📡  TOKEN OTOMATIS — DEVICE FLOW             ║${C_RESET}" >&2
+  echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
+  echo "" >&2
+
+  if [ -z "$GH_OAUTH_CLIENT_ID" ]; then
+    echo -e "  ${C_RED}❌ GH_OAUTH_CLIENT_ID belum diisi di push.sh${C_RESET}" >&2
+    echo "" >&2
+    echo -e "${C_BOLD}Cara setup (gratis, sekali saja):${C_RESET}" >&2
+    echo -e "  ${C_CYAN}1.${C_RESET} Buka → ${C_BLUE}https://github.com/settings/developers${C_RESET}" >&2
+    echo -e "  ${C_CYAN}2.${C_RESET} Klik ${C_BOLD}New OAuth App${C_RESET}" >&2
+    echo -e "  ${C_CYAN}3.${C_RESET} Isi nama bebas, Homepage URL bebas, Callback: ${C_DIM}http://localhost${C_RESET}" >&2
+    echo -e "  ${C_CYAN}4.${C_RESET} Klik ${C_BOLD}Register application${C_RESET} → copy ${C_BOLD}Client ID${C_RESET}" >&2
+    echo -e "  ${C_CYAN}5.${C_RESET} Paste ke variabel ${C_BOLD}GH_OAUTH_CLIENT_ID${C_RESET} di push.sh" >&2
+    echo "" >&2
+    echo -e "  ${C_DIM}Tekan Enter untuk kembali ke menu...${C_RESET}" >&2
+    read -r </dev/tty
+    echo ""
+    return
+  fi
+
+  local _SCOPES="repo,workflow,write:packages,delete:packages,admin:org,admin:public_key"
+  _SCOPES="${_SCOPES},admin:repo_hook,admin:org_hook,gist,notifications,user,delete_repo"
+  _SCOPES="${_SCOPES},write:discussion,admin:enterprise,audit_log,codespace,project"
+
+  echo -e "${C_DIM}  ⏳ Menghubungi GitHub untuk device code...${C_RESET}" >&2
+
+  local dev_resp dev_code user_code verif_uri interval expires_in
+  dev_resp=$(curl -s -X POST "https://github.com/login/device/code" \
+    -H "Accept: application/json" \
+    -d "client_id=${GH_OAUTH_CLIENT_ID}&scope=${_SCOPES}" 2>/dev/null)
+
+  dev_code=$(echo "$dev_resp"   | grep -o '"device_code":"[^"]*"'   | sed 's/"device_code":"//;s/"//')
+  user_code=$(echo "$dev_resp"  | grep -o '"user_code":"[^"]*"'     | sed 's/"user_code":"//;s/"//')
+  verif_uri=$(echo "$dev_resp"  | grep -o '"verification_uri":"[^"]*"' | sed 's/"verification_uri":"//;s/"//')
+  interval=$(echo "$dev_resp"   | grep -o '"interval":[0-9]*'        | sed 's/"interval"://')
+  expires_in=$(echo "$dev_resp" | grep -o '"expires_in":[0-9]*'      | sed 's/"expires_in"://')
+
+  interval="${interval:-5}"
+  expires_in="${expires_in:-900}"
+
+  if [ -z "$dev_code" ] || [ -z "$user_code" ]; then
+    echo "" >&2
+    echo -e "  ${C_RED}❌ Gagal mendapatkan device code dari GitHub.${C_RESET}" >&2
+    echo -e "  ${C_DIM}   Periksa GH_OAUTH_CLIENT_ID apakah benar.${C_RESET}" >&2
+    echo "" >&2
+    echo -e "  ${C_DIM}Tekan Enter untuk kembali...${C_RESET}" >&2
+    read -r </dev/tty
+    echo ""
+    return
+  fi
+
+  clear 2>/dev/null || true
+  echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}" >&2
+  echo -e "${C_BOLD}║     📡  TOKEN OTOMATIS — DEVICE FLOW             ║${C_RESET}" >&2
+  echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
+  echo "" >&2
+  echo -e "${C_BOLD}Langkah:${C_RESET}" >&2
+  echo -e "  ${C_CYAN}1.${C_RESET} Buka browser → ${C_BLUE}${verif_uri}${C_RESET}" >&2
+  echo -e "  ${C_CYAN}2.${C_RESET} Masukkan kode ini:" >&2
+  echo "" >&2
+  echo -e "     ${C_BOLD}${C_GREEN}  ${user_code}  ${C_RESET}" >&2
+  echo "" >&2
+  echo -e "  ${C_CYAN}3.${C_RESET} Klik ${C_BOLD}Authorize${C_RESET} di GitHub" >&2
+  echo -e "  ${C_CYAN}4.${C_RESET} Token akan muncul di sini otomatis ✨" >&2
+  echo "" >&2
+  echo -e "${C_DIM}  ⏳ Menunggu otorisasi... (berlaku ${expires_in}s)${C_RESET}" >&2
+  echo "" >&2
+
+  local elapsed=0 poll_resp access_tok err_code
+  while [ "$elapsed" -lt "$expires_in" ]; do
+    sleep "$interval"
+    elapsed=$((elapsed + interval))
+
+    poll_resp=$(curl -s -X POST "https://github.com/login/oauth/access_token" \
+      -H "Accept: application/json" \
+      -d "client_id=${GH_OAUTH_CLIENT_ID}&device_code=${dev_code}&grant_type=urn:ietf:params:oauth:grant-type:device_code" \
+      2>/dev/null)
+
+    access_tok=$(echo "$poll_resp" | grep -o '"access_token":"[^"]*"' | sed 's/"access_token":"//;s/"//')
+    err_code=$(echo "$poll_resp"   | grep -o '"error":"[^"]*"'        | sed 's/"error":"//;s/"//')
+
+    if [ -n "$access_tok" ]; then
+      clear 2>/dev/null || true
+      echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}" >&2
+      echo -e "${C_BOLD}║     📡  TOKEN OTOMATIS — DEVICE FLOW             ║${C_RESET}" >&2
+      echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
+      echo "" >&2
+      printf '%s' "$access_tok" > .token.secret
+      echo -e "  ${C_GREEN}🎉 Berhasil! Token diterima dan tersimpan otomatis ke .token.secret${C_RESET}" >&2
+      echo -e "  ${C_DIM}   File ini gitignored — aman, tidak ke-upload ke GitHub${C_RESET}" >&2
+      echo "" >&2
+      sleep 1
+      echo "$access_tok"
+      return
+    fi
+
+    case "$err_code" in
+      authorization_pending) continue ;;
+      slow_down) interval=$((interval + 5)) ;;
+      expired_token)
+        echo -e "  ${C_RED}❌ Kode expired. Coba lagi.${C_RESET}" >&2
+        sleep 2
+        echo ""
+        return
+        ;;
+      access_denied)
+        echo -e "  ${C_RED}❌ Ditolak. Klik Authorize di GitHub untuk melanjutkan.${C_RESET}" >&2
+        sleep 2
+        echo ""
+        return
+        ;;
+    esac
+
+    printf "${C_DIM}  ⏳ Menunggu... (%ds)${C_RESET}\r" "$elapsed" >&2
+  done
+
+  echo -e "  ${C_RED}❌ Timeout. Coba jalankan lagi.${C_RESET}" >&2
+  sleep 2
+  echo ""
+}
+
 # ===== Baca token =====
 # Urutan prioritas:
 #   1. .token.secret  → file token asli (GITIGNORED, aman)
@@ -227,11 +362,14 @@ setup_token() {
     echo -e "${C_DIM}   Token dibutuhkan agar script bisa push ke GitHub.${C_RESET}" >&2
     echo "" >&2
     echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
-    echo -e "  ${C_GREEN}1${C_RESET} Generate token otomatis ${C_DIM}(buka GitHub, scope repo sudah terisi)${C_RESET}" >&2
-    echo -e "  ${C_CYAN}2${C_RESET} Input token manual ${C_DIM}(sudah punya token)${C_RESET}" >&2
+    echo -e "  ${C_GREEN}1${C_RESET} Generate token ${C_DIM}(buka URL GitHub, semua scope tercentang)${C_RESET}" >&2
+    local _df_hint="${C_DIM}(butuh GH_OAUTH_CLIENT_ID)${C_RESET}"
+    [ -n "$GH_OAUTH_CLIENT_ID" ] && _df_hint="${C_GREEN}(siap dipakai)${C_RESET}"
+    echo -e "  ${C_MAGENTA}2${C_RESET} Token otomatis — Device Flow ${_df_hint}" >&2
+    echo -e "  ${C_CYAN}3${C_RESET} Input token manual ${C_DIM}(sudah punya token)${C_RESET}" >&2
     echo -e "  ${C_RED}0${C_RESET} Batal / keluar" >&2
     echo "" >&2
-    printf "${C_BOLD}  Pilih [1/2/0] ▸ ${C_RESET}" >&2
+    printf "${C_BOLD}  Pilih [1/2/3/0] ▸ ${C_RESET}" >&2
 
     local pick=""
     read -r pick </dev/tty
@@ -242,6 +380,9 @@ setup_token() {
         tok=$(screen_generate_token)
         ;;
       2)
+        tok=$(screen_device_flow)
+        ;;
+      3)
         tok=$(screen_manual_token)
         ;;
       0|q|Q|exit)

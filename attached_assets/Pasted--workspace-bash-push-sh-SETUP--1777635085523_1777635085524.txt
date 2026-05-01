@@ -1,0 +1,44 @@
+~/workspace$ bash push.sh
+╔══════════════════════════════════════════════════╗
+║        🔐  SETUP TOKEN GITHUB — BANG WILY        ║
+╚══════════════════════════════════════════════════╝
+
+⚠️  Token GitHub belum ada / tidak valid.
+   Token dibutuhkan agar script bisa push ke GitHub.
+
+─────────────────────────────────────────────────
+  1 Generate token otomatis (buka GitHub, scope repo sudah terisi)
+  2 Input token manual (sudah punya token)
+  0 Batal / keluar
+
+  Pilih [1/2/0] ▸ 1
+╔══════════════════════════════════════════════════╗
+║     🔑  GENERATE TOKEN OTOMATIS — BANG WILY      ║
+╚══════════════════════════════════════════════════╝
+
+Pilih masa berlaku token:
+
+  1 No expiration  (tidak ada batas waktu — praktis)
+  2 1 tahun        (365 hari)
+  3 90 hari
+  4 30 hari
+
+  Pilih [1/2/3/4] ▸ 1
+╔══════════════════════════════════════════════════╗
+║     🔑  GENERATE TOKEN OTOMATIS — BANG WILY      ║
+╚══════════════════════════════════════════════════╝
+
+  Semua scope sudah tercentang • nama token sudah terisi
+
+  ✅ Browser terbuka!
+     Kalau tidak terbuka, copy URL di bawah:
+
+  https://github.com/settings/tokens/new?description=BangWilyPushScript&scopes=repo,repo:status,repo_deployment,public_repo,repo:invite,security_events,workflow,write:packages,read:packages,delete:packages,admin:org,write:org,read:org,manage_runners:org,admin:public_key,write:public_key,read:public_key,admin:repo_hook,write:repo_hook,read:repo_hook,admin:org_hook,gist,notifications,user,read:user,user:email,user:follow,delete_repo,write:discussion,read:discussion,admin:enterprise,manage_runners:enterprise,manage_billing:enterprise,read:enterprise,scim:enterprise,audit_log,read:audit_log,codespace,codespace:secrets,copilot,manage_billing:copilot,write:network_configurations,read:network_configurations,project,read:project,admin:gpg_key,write:gpg_key,read:gpg_key,admin:ssh_signing_key,write:ssh_signing_key,read:ssh_signing_key
+
+─────────────────────────────────────────────────
+Langkah di GitHub:
+  1. Di kolom Expiration → pilih No expiration
+  2. Klik Generate token (tombol hijau, paling bawah)
+  3. Copy token yang muncul → paste di sini
+
+─────────────────────────────────────────────────
