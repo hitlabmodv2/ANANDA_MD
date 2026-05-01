@@ -264,53 +264,112 @@ setup_token() {
   echo "$tok"
 }
 
+# ===== Hitung sisa hari dari tanggal expiry token =====
+# $1 = string tanggal dari header GitHub-Authentication-Token-Expiration
+#      contoh format: "2026-05-31 00:00:00 UTC"
+# Output: angka sisa hari (bisa 0 atau negatif jika sudah lewat)
+_token_days_left() {
+  local exp_str="$1"
+  # Ambil bagian tanggal saja (YYYY-MM-DD)
+  local exp_date
+  exp_date=$(echo "$exp_str" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1)
+  [ -z "$exp_date" ] && echo "?" && return
+
+  local exp_epoch now_epoch
+  exp_epoch=$(date -d "$exp_date" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$exp_date" +%s 2>/dev/null)
+  now_epoch=$(date +%s)
+
+  [ -z "$exp_epoch" ] && echo "?" && return
+  echo $(( (exp_epoch - now_epoch) / 86400 ))
+}
+
+# ===== Tampilkan status masa berlaku token =====
+# $1 = nilai header GitHub-Authentication-Token-Expiration (kosong = no expiry)
+_print_token_expiry() {
+  local exp_str="$1"
+
+  if [ -z "$exp_str" ]; then
+    echo -e "  ${C_GREEN}♾️  Masa berlaku: ${C_BOLD}No expiration${C_RESET}${C_GREEN} — token tidak akan expired${C_RESET}" >&2
+    return
+  fi
+
+  local days_left
+  days_left=$(_token_days_left "$exp_str")
+
+  if [ "$days_left" = "?" ]; then
+    echo -e "  ${C_DIM}  Masa berlaku: ${exp_str} (gagal parse tanggal)${C_RESET}" >&2
+    return
+  fi
+
+  if [ "$days_left" -lt 0 ]; then
+    echo -e "  ${C_RED}💀 Token SUDAH EXPIRED sejak ${exp_str}!${C_RESET}" >&2
+  elif [ "$days_left" -eq 0 ]; then
+    echo -e "  ${C_RED}🚨 Token EXPIRES HARI INI! Segera generate token baru.${C_RESET}" >&2
+  elif [ "$days_left" -le 3 ]; then
+    echo -e "  ${C_RED}🔴 Token expires dalam ${C_BOLD}${days_left} hari${C_RESET}${C_RED} (${exp_str}) — SEGERA perbarui!${C_RESET}" >&2
+  elif [ "$days_left" -le 7 ]; then
+    echo -e "  ${C_YELLOW}🟡 Token expires dalam ${C_BOLD}${days_left} hari${C_RESET}${C_YELLOW} (${exp_str}) — segera perbarui.${C_RESET}" >&2
+  elif [ "$days_left" -le 30 ]; then
+    echo -e "  ${C_YELLOW}🟠 Token expires dalam ${C_BOLD}${days_left} hari${C_RESET}${C_YELLOW} (${exp_str}).${C_RESET}" >&2
+  else
+    echo -e "  ${C_GREEN}✅ Masa berlaku: ${C_BOLD}${days_left} hari lagi${C_RESET}${C_GREEN} (${exp_str})${C_RESET}" >&2
+  fi
+}
+
 # ===== Validasi token ke GitHub API secara real-time =====
 # Cek apakah token benar-benar valid/aktif sebelum lanjut.
+# Sekaligus cek & tampilkan masa berlaku token dari response header.
 # Return 0 = valid, 1 = invalid/expired, 2 = tidak bisa cek (network error)
 validate_token() {
   local tok="$1"
-  local response http_code login rate_limit
+  local http_code login expiry_header
 
   echo -e "${C_DIM}  🔄 Memvalidasi token ke GitHub...${C_RESET}" >&2
 
-  response=$(curl -s -o /tmp/_gh_validate.json -w "%{http_code}" \
+  # Simpan headers ke file terpisah agar bisa baca GitHub-Authentication-Token-Expiration
+  http_code=$(curl -s \
+    -o /tmp/_gh_validate.json \
+    -D /tmp/_gh_validate_headers.txt \
+    -w "%{http_code}" \
     -H "Authorization: token ${tok}" \
     -H "Accept: application/vnd.github+json" \
     -H "X-GitHub-Api-Version: 2022-11-28" \
     "https://api.github.com/user" 2>/dev/null)
-  http_code="$response"
 
   case "$http_code" in
     200)
       login=$(grep -o '"login":"[^"]*"' /tmp/_gh_validate.json 2>/dev/null | head -1 | sed 's/"login":"//;s/"//')
-      rate_limit=$(grep -o '"X-RateLimit-Remaining":"[^"]*"' /tmp/_gh_validate.json 2>/dev/null | head -1 | sed 's/.*":"//;s/"//')
+      # Baca header masa berlaku token (kosong = no expiry)
+      expiry_header=$(grep -i '^github-authentication-token-expiration:' /tmp/_gh_validate_headers.txt 2>/dev/null \
+                      | sed 's/^[^:]*: *//;s/\r//' | head -1)
       echo -e "  ${C_GREEN}✅ Token valid!${C_RESET} Login sebagai: ${C_BOLD}${login}${C_RESET}" >&2
-      rm -f /tmp/_gh_validate.json
+      _print_token_expiry "$expiry_header"
+      rm -f /tmp/_gh_validate.json /tmp/_gh_validate_headers.txt
       return 0
       ;;
     401)
       echo "" >&2
       echo -e "  ${C_RED}❌ Token TIDAK valid atau sudah expired!${C_RESET}" >&2
       echo -e "  ${C_DIM}   HTTP 401 Unauthorized — token ditolak oleh GitHub.${C_RESET}" >&2
-      rm -f /tmp/_gh_validate.json .token.secret 2>/dev/null
+      rm -f /tmp/_gh_validate.json /tmp/_gh_validate_headers.txt .token.secret 2>/dev/null
       return 1
       ;;
     403)
       echo "" >&2
       echo -e "  ${C_RED}❌ Token ditolak — permission kurang (HTTP 403).${C_RESET}" >&2
       echo -e "  ${C_DIM}   Pastikan token punya scope: repo (full control).${C_RESET}" >&2
-      rm -f /tmp/_gh_validate.json .token.secret 2>/dev/null
+      rm -f /tmp/_gh_validate.json /tmp/_gh_validate_headers.txt .token.secret 2>/dev/null
       return 1
       ;;
     ""|000)
       echo -e "  ${C_YELLOW}⚠️  Tidak bisa cek token (tidak ada koneksi internet / GitHub down).${C_RESET}" >&2
       echo -e "  ${C_DIM}   Lanjut tanpa validasi...${C_RESET}" >&2
-      rm -f /tmp/_gh_validate.json
+      rm -f /tmp/_gh_validate.json /tmp/_gh_validate_headers.txt
       return 2
       ;;
     *)
       echo -e "  ${C_YELLOW}⚠️  Respon GitHub tidak terduga (HTTP ${http_code}), lanjut...${C_RESET}" >&2
-      rm -f /tmp/_gh_validate.json
+      rm -f /tmp/_gh_validate.json /tmp/_gh_validate_headers.txt
       return 2
       ;;
   esac
