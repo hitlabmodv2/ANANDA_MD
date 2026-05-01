@@ -337,11 +337,7 @@ export async function participantsUpdate({ id, participants, action, simulate = 
                                 const isBotAffected = user === this.user.jid;
 
                                 if (isBotAffected) {
-                                        const aiText = await honoluluSpeak(action).catch(() => null);
-                                        const picked = aiText || (action === 'promote'
-                                                ? `hm. aku jadi admin sekarang.\nya udah, aku pegang. jangan bikin repot.`
-                                                : `di-non-adminkan?\nya terserah. aku tetap di sini kok.`);
-                                        this.sendMessage(id, { text: picked });
+                                        await honoluluSpeak(action, this, id);
                                 } else {
                                         text = (
                                                 action === 'promote'
