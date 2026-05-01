@@ -27,6 +27,14 @@ export async function handler(chatUpdate) {
 
                 if (typeof m.text !== 'string') m.text = '';
 
+                const _name = m.pushName || m.sender.replace(/@.+/, '');
+                const _num  = m.sender.replace(/@.+/, '');
+                const _type = m.isGroup ? chalk.green('[GC]') : chalk.blue('[PM]');
+                const _text = m.text ? (m.text.length > 60 ? m.text.slice(0, 60) + '…' : m.text) : chalk.gray('(media)');
+                const _time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                console.log(`${_type} ${chalk.yellow(_time)} ${chalk.cyan(_name)} ${chalk.gray(_num)}`);
+                console.log(`  └ ${_text}`);
+
                 const isROwner = [conn.decodeJid(global.conn.user.id), ...global.owner.map(([number]) => number)].map((v) => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender);
                 const isOwner = isROwner || m.fromMe;
                 const isPrems = isROwner || db.data.users[m.sender]?.premiumTime > 0;
