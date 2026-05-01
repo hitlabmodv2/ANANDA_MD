@@ -95,12 +95,39 @@ screen_generate_token() {
   _ALL_SCOPES="${_ALL_SCOPES},admin:ssh_signing_key,write:ssh_signing_key,read:ssh_signing_key"
   local TOKEN_URL="https://github.com/settings/tokens/new?description=BangWilyPushScript&scopes=${_ALL_SCOPES}"
 
+  # ── Pilih Expiration ──
   clear 2>/dev/null || true
   echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}" >&2
   echo -e "${C_BOLD}║     🔑  GENERATE TOKEN OTOMATIS — BANG WILY      ║${C_RESET}" >&2
   echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
   echo "" >&2
-  echo -e "${C_DIM}  Membuka halaman GitHub... (${C_BOLD}semua scope${C_RESET}${C_DIM} sudah tercentang, nama token sudah terisi)${C_RESET}" >&2
+  echo -e "${C_BOLD}Pilih masa berlaku token:${C_RESET}" >&2
+  echo "" >&2
+  echo -e "  ${C_GREEN}1${C_RESET} No expiration  ${C_DIM}(tidak ada batas waktu — praktis)${C_RESET}" >&2
+  echo -e "  ${C_CYAN}2${C_RESET} 1 tahun        ${C_DIM}(365 hari)${C_RESET}" >&2
+  echo -e "  ${C_CYAN}3${C_RESET} 90 hari" >&2
+  echo -e "  ${C_CYAN}4${C_RESET} 30 hari" >&2
+  echo "" >&2
+  printf "${C_BOLD}  Pilih [1/2/3/4] ▸ ${C_RESET}" >&2
+
+  local exp_pick="" exp_label=""
+  read -r exp_pick </dev/tty
+  exp_pick="${exp_pick:-1}"
+
+  case "$exp_pick" in
+    2) exp_label="1 tahun (365 hari)" ;;
+    3) exp_label="90 hari" ;;
+    4) exp_label="30 hari" ;;
+    *) exp_pick="1"; exp_label="No expiration" ;;
+  esac
+
+  # ── Buka browser & tampilkan instruksi ──
+  clear 2>/dev/null || true
+  echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}" >&2
+  echo -e "${C_BOLD}║     🔑  GENERATE TOKEN OTOMATIS — BANG WILY      ║${C_RESET}" >&2
+  echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
+  echo "" >&2
+  echo -e "${C_DIM}  Semua scope sudah tercentang • nama token sudah terisi${C_RESET}" >&2
   echo "" >&2
 
   if open_url "$TOKEN_URL"; then
@@ -108,7 +135,7 @@ screen_generate_token() {
     echo -e "  ${C_DIM}   Kalau tidak terbuka, copy URL di bawah:${C_RESET}" >&2
   else
     echo -e "  ${C_YELLOW}⚠️  Tidak bisa buka browser otomatis.${C_RESET}" >&2
-    echo -e "  ${C_DIM}   Copy URL berikut → buka di browser manual:${C_RESET}" >&2
+    echo -e "  ${C_DIM}   Copy URL berikut → buka di browser kamu:${C_RESET}" >&2
   fi
 
   echo "" >&2
@@ -116,8 +143,8 @@ screen_generate_token() {
   echo "" >&2
   echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
   echo -e "${C_BOLD}Langkah di GitHub:${C_RESET}" >&2
-  echo -e "  ${C_CYAN}1.${C_RESET} Isi ${C_BOLD}Expiration${C_RESET} (misal: No expiration)" >&2
-  echo -e "  ${C_CYAN}2.${C_RESET} Klik ${C_BOLD}Generate token${C_RESET} (hijau, paling bawah)" >&2
+  echo -e "  ${C_CYAN}1.${C_RESET} Di kolom ${C_BOLD}Expiration${C_RESET} → pilih ${C_GREEN}${C_BOLD}${exp_label}${C_RESET}" >&2
+  echo -e "  ${C_CYAN}2.${C_RESET} Klik ${C_BOLD}Generate token${C_RESET} (tombol hijau, paling bawah)" >&2
   echo -e "  ${C_CYAN}3.${C_RESET} Copy token yang muncul → paste di sini" >&2
   echo "" >&2
   echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
