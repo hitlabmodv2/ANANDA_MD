@@ -142,16 +142,15 @@ validate_token() {
     401)
       echo "" >&2
       echo -e "  ${C_RED}❌ Token TIDAK valid atau sudah expired!${C_RESET}" >&2
-      echo -e "  ${C_DIM}   HTTP 401 Unauthorized dari GitHub API.${C_RESET}" >&2
-      echo -e "  ${C_DIM}   Hapus .token.secret dan jalankan push.sh lagi untuk input token baru.${C_RESET}" >&2
+      echo -e "  ${C_DIM}   HTTP 401 Unauthorized — token ditolak oleh GitHub.${C_RESET}" >&2
       rm -f /tmp/_gh_validate.json .token.secret 2>/dev/null
       return 1
       ;;
     403)
       echo "" >&2
-      echo -e "  ${C_YELLOW}⚠️  Token valid tapi rate-limited atau permission kurang (HTTP 403).${C_RESET}" >&2
+      echo -e "  ${C_RED}❌ Token ditolak — permission kurang (HTTP 403).${C_RESET}" >&2
       echo -e "  ${C_DIM}   Pastikan token punya scope: repo (full control).${C_RESET}" >&2
-      rm -f /tmp/_gh_validate.json
+      rm -f /tmp/_gh_validate.json .token.secret 2>/dev/null
       return 1
       ;;
     ""|000)
@@ -171,12 +170,39 @@ validate_token() {
 TOKEN=$(setup_token)
 
 # Validasi token ke GitHub secara real-time
-validate_result=0
-validate_token "$TOKEN" || validate_result=$?
-if [ "$validate_result" -eq 1 ]; then
-  echo -e "\n${C_RED}Script berhenti. Jalankan lagi: bash push.sh${C_RESET}" >&2
-  exit 1
-fi
+# Kalau invalid/expired → hapus .token.secret dan minta ulang (max 3x percobaan)
+_token_attempts=0
+while true; do
+  validate_result=0
+  validate_token "$TOKEN" || validate_result=$?
+
+  if [ "$validate_result" -eq 0 ] || [ "$validate_result" -eq 2 ]; then
+    break
+  fi
+
+  # validate_result=1 → token invalid, sudah dihapus oleh validate_token()
+  _token_attempts=$((_token_attempts + 1))
+  if [ "$_token_attempts" -ge 3 ]; then
+    echo -e "\n${C_RED}❌ Sudah 3x percobaan, token tetap tidak valid. Script berhenti.${C_RESET}" >&2
+    exit 1
+  fi
+
+  echo "" >&2
+  echo -e "${C_YELLOW}🔁 Silakan masukkan token GitHub yang baru:${C_RESET}" >&2
+  printf "${C_BOLD}  Paste token kamu ▸ ${C_RESET}" >&2
+  local_new_tok=""
+  read -rs local_new_tok </dev/tty
+  echo "" >&2
+  local_new_tok=$(echo "$local_new_tok" | tr -d '\n\r ')
+
+  if [ -z "$local_new_tok" ] || echo "$local_new_tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
+    echo -e "  ${C_RED}Token kosong atau placeholder, coba lagi.${C_RESET}" >&2
+    continue
+  fi
+
+  printf '%s' "$local_new_tok" > .token.secret
+  TOKEN="$local_new_tok"
+done
 
 REMOTE_URL="https://${USER}:${TOKEN}@github.com/${USER}/${REPO}.git"
 
