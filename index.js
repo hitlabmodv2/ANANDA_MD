@@ -1,7 +1,12 @@
 process.stdout?._handle?.setBlocking?.(true);
 process.stderr?._handle?.setBlocking?.(true);
 
-console.log('🐾 Starting...');
+console.log('');
+console.log('┌─────────────────────┐');
+console.log('│   🐾  C H I I B O T │');
+console.log('│   v2.0  Starting... │');
+console.log('└─────────────────────┘');
+console.log('');
 
 import { Worker } from 'worker_threads';
 import { join, dirname } from 'path';
@@ -37,7 +42,7 @@ function start(file) {
         });
 
         worker.on('exit', (code) => {
-                console.log('❗ Worker exited with code', code);
+                console.log('❗ Exit:', code);
                 running = false;
                 if (code !== 0) {
                         restartTimer = setTimeout(
@@ -50,7 +55,7 @@ function start(file) {
                 }
                 watchFile(full, () => {
                         unwatchFile(full);
-                        console.log('♻️ File updated → Restarting...');
+                        console.log('♻️ File updated, restarting...');
                         start(file);
                 });
         });
