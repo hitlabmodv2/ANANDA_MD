@@ -59,30 +59,59 @@ CUSTOM_MSG="${1:-}"
 # Urutan prioritas:
 #   1. .token.secret  → file token asli (GITIGNORED, aman)
 #   2. .token         → hanya berisi contoh/tutorial (aman di-upload ke GitHub)
-TOKEN=""
-if [ -f .token.secret ]; then
-  TOKEN=$(tr -d '\n\r ' < .token.secret)
-fi
+setup_token() {
+  local tok=""
 
-# Kalau .token.secret kosong / tidak ada, coba baca .token
-# tapi pastikan isinya bukan placeholder tutorial
-if [ -z "$TOKEN" ]; then
-  if [ ! -f .token ]; then
-    echo -e "${C_RED}❌ File .token.secret tidak ada!${C_RESET}"
-    echo "   Bikin dulu : ${C_DIM}echo 'ghp_xxxxxxxx' > .token.secret${C_RESET}"
-    echo "   ${C_DIM}(.token hanya untuk contoh/tutorial, token asli di .token.secret)${C_RESET}"
-    exit 1
+  # Coba baca dari .token.secret
+  if [ -f .token.secret ]; then
+    tok=$(tr -d '\n\r ' < .token.secret)
   fi
-  TOKEN=$(tr -d '\n\r ' < .token)
-fi
 
-# Tolak kalau isinya masih placeholder / tutorial
-if [ -z "$TOKEN" ] || echo "$TOKEN" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
-  echo -e "${C_RED}❌ Token belum diisi!${C_RESET}"
-  echo "   Simpan token asli kamu di: ${C_DIM}.token.secret${C_RESET}"
-  echo "   Contoh: ${C_DIM}echo 'ghp_xxxxxxxx' > .token.secret${C_RESET}"
-  exit 1
-fi
+  # Kalau masih kosong atau placeholder, tanya interaktif
+  if [ -z "$tok" ] || echo "$tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
+    clear 2>/dev/null || true
+    echo -e "${C_BOLD}🔐 Setup Token GitHub${C_RESET}"
+    echo -e "${C_DIM}File .token.secret belum ada atau belum diisi.${C_RESET}"
+    echo ""
+    echo -e "Cara dapat token:"
+    echo -e "  ${C_CYAN}1.${C_RESET} Buka ${C_BLUE}https://github.com/settings/tokens${C_RESET}"
+    echo -e "  ${C_CYAN}2.${C_RESET} Klik ${C_BOLD}Generate new token (classic)${C_RESET}"
+    echo -e "  ${C_CYAN}3.${C_RESET} Centang scope: ${C_BOLD}repo${C_RESET} (full control)"
+    echo -e "  ${C_CYAN}4.${C_RESET} Copy token → paste di bawah ini"
+    echo ""
+    printf "${C_BOLD}Paste token GitHub kamu ▸ ${C_RESET}"
+
+    # Sembunyikan input (seperti password)
+    local input_tok=""
+    if [ -t 0 ]; then
+      read -rs input_tok
+      echo ""
+    else
+      read -r input_tok
+    fi
+
+    input_tok=$(echo "$input_tok" | tr -d '\n\r ')
+
+    if [ -z "$input_tok" ] || echo "$input_tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
+      echo ""
+      echo -e "${C_RED}❌ Token tidak valid / kosong. Script berhenti.${C_RESET}"
+      exit 1
+    fi
+
+    # Simpan ke .token.secret
+    printf '%s' "$input_tok" > .token.secret
+    echo ""
+    echo -e "  ${C_GREEN}✅ Token disimpan ke .token.secret${C_RESET}"
+    echo -e "  ${C_DIM}   (File ini gitignored — tidak akan ke-upload ke GitHub)${C_RESET}"
+    echo ""
+    sleep 1
+    tok="$input_tok"
+  fi
+
+  echo "$tok"
+}
+
+TOKEN=$(setup_token)
 
 REMOTE_URL="https://${USER}:${TOKEN}@github.com/${USER}/${REPO}.git"
 
