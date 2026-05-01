@@ -32,7 +32,7 @@ USER="hitlabmodv2"
 REPO="ANANDA_MD"
 # DEFAULT_BRANCH di-auto-detect realtime dari GitHub (lihat detect_default_branch).
 # Nilai di sini cuma fallback kalau koneksi ke GitHub bermasalah.
-DEFAULT_BRANCH="HONOLULU_AI_V1_2_TSUNDERE"
+DEFAULT_BRANCH="main"
 
 # Branch yang disembunyikan dari menu (system / internal).
 # Pisahkan dengan spasi. Contoh: "replit-agent gh-pages backup"
@@ -491,15 +491,42 @@ action_switch_default() {
 
   local new_default="${branches[$((pick - 1))]}"
   local old_default="$DEFAULT_BRANCH"
-  DEFAULT_BRANCH="$new_default"
-
-  # Update nilai DEFAULT_BRANCH di dalam push.sh itu sendiri secara permanen
-  sed -i "s|^DEFAULT_BRANCH=.*|DEFAULT_BRANCH=\"${new_default}\"|" "$0" 2>/dev/null || true
 
   echo ""
-  echo -e "  ${C_GREEN}✅ Default branch berubah:${C_RESET}"
-  echo -e "     ${C_DIM}${old_default}${C_RESET} ${C_BOLD}→${C_RESET} ${C_GREEN}${new_default}${C_RESET}"
-  echo -e "  ${C_DIM}Perubahan disimpan permanen di push.sh${C_RESET}"
+  echo -e "  ${C_CYAN}▸${C_RESET} Menghubungi GitHub API untuk ganti default branch..."
+
+  # Panggil GitHub API untuk benar-benar ganti default branch di remote
+  local api_resp api_http
+  api_resp=$(curl -s -o /tmp/_gh_switch.json -w "%{http_code}" \
+    -X PATCH \
+    -H "Authorization: token ${TOKEN}" \
+    -H "Accept: application/vnd.github+json" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    "https://api.github.com/repos/${USER}/${REPO}" \
+    -d "{\"default_branch\":\"${new_default}\"}" 2>/dev/null)
+  api_http="${api_resp}"
+
+  if [ "$api_http" = "200" ]; then
+    # Sukses — update variabel lokal & simpan ke push.sh
+    DEFAULT_BRANCH="$new_default"
+    sed -i "s|^DEFAULT_BRANCH=.*|DEFAULT_BRANCH=\"${new_default}\"|" "$0" 2>/dev/null || true
+
+    echo ""
+    echo -e "  ${C_GREEN}✅ Default branch berhasil diubah di GitHub!${C_RESET}"
+    echo -e "     ${C_DIM}${old_default}${C_RESET} ${C_BOLD}→${C_RESET} ${C_GREEN}${new_default}${C_RESET}"
+    echo -e "  ${C_BLUE}🔗 https://github.com/${USER}/${REPO}${C_RESET}"
+    echo -e "  ${C_DIM}Perubahan juga disimpan permanen di push.sh${C_RESET}"
+  else
+    # Gagal — tampilkan error dari API
+    local api_msg
+    api_msg=$(grep -o '"message":"[^"]*"' /tmp/_gh_switch.json 2>/dev/null | head -1 | sed 's/"message":"//;s/"//')
+    echo ""
+    echo -e "  ${C_RED}❌ Gagal ubah default branch di GitHub (HTTP ${api_http})${C_RESET}"
+    [ -n "$api_msg" ] && echo -e "  ${C_DIM}   GitHub: ${api_msg}${C_RESET}"
+    echo -e "  ${C_DIM}   Pastikan token punya permission: repo (write access)${C_RESET}"
+  fi
+
+  rm -f /tmp/_gh_switch.json
   echo ""
   echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
   printf "${C_BOLD}▸ ${C_RESET}"
