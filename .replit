@@ -7,7 +7,7 @@ expertMode = true
 stack = "BEST_EFFORT_FALLBACK"
 
 [workflows]
-runButton = "Project"
+runButton = "Start application"
 
 [[workflows.workflow]]
 name = "Project"
@@ -24,7 +24,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm start"
+args = "[ ! -f node_modules/.package-lock.json ] && npm install; node index.js"
 
 [workflows.workflow.metadata]
 outputType = "console"
