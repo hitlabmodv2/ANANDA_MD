@@ -55,10 +55,112 @@ fi
 
 CUSTOM_MSG="${1:-}"
 
+# ===== Helper: buka URL di browser (Termux / Linux / macOS) =====
+open_url() {
+  local url="$1"
+  if command -v termux-open-url >/dev/null 2>&1; then
+    termux-open-url "$url" 2>/dev/null &
+  elif command -v xdg-open >/dev/null 2>&1; then
+    xdg-open "$url" 2>/dev/null &
+  elif command -v open >/dev/null 2>&1; then
+    open "$url" 2>/dev/null &
+  else
+    return 1
+  fi
+  return 0
+}
+
+# ===== Layar generate token otomatis =====
+# Buka halaman GitHub pre-filled → scope repo sudah tercentang otomatis.
+screen_generate_token() {
+  local TOKEN_URL="https://github.com/settings/tokens/new?description=BangWilyPushScript&scopes=repo"
+
+  clear 2>/dev/null || true
+  echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}" >&2
+  echo -e "${C_BOLD}║     🔑  GENERATE TOKEN OTOMATIS — BANG WILY      ║${C_RESET}" >&2
+  echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
+  echo "" >&2
+  echo -e "${C_DIM}  Membuka halaman GitHub... (scope ${C_BOLD}repo${C_RESET}${C_DIM} sudah tercentang)${C_RESET}" >&2
+  echo "" >&2
+
+  if open_url "$TOKEN_URL"; then
+    echo -e "  ${C_GREEN}✅ Browser terbuka!${C_RESET}" >&2
+    echo -e "  ${C_DIM}   Kalau tidak terbuka, copy URL di bawah:${C_RESET}" >&2
+  else
+    echo -e "  ${C_YELLOW}⚠️  Tidak bisa buka browser otomatis.${C_RESET}" >&2
+    echo -e "  ${C_DIM}   Copy URL berikut → buka di browser manual:${C_RESET}" >&2
+  fi
+
+  echo "" >&2
+  echo -e "  ${C_BLUE}${TOKEN_URL}${C_RESET}" >&2
+  echo "" >&2
+  echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
+  echo -e "${C_BOLD}Langkah di GitHub:${C_RESET}" >&2
+  echo -e "  ${C_CYAN}1.${C_RESET} Isi ${C_BOLD}Expiration${C_RESET} (misal: No expiration)" >&2
+  echo -e "  ${C_CYAN}2.${C_RESET} Klik ${C_BOLD}Generate token${C_RESET} (hijau, paling bawah)" >&2
+  echo -e "  ${C_CYAN}3.${C_RESET} Copy token yang muncul → paste di sini" >&2
+  echo "" >&2
+  echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
+  printf "${C_BOLD}  Paste token baru ▸ ${C_RESET}" >&2
+
+  local input_tok=""
+  read -rs input_tok </dev/tty
+  echo "" >&2
+  input_tok=$(echo "$input_tok" | tr -d '\n\r ')
+
+  if [ -z "$input_tok" ] || echo "$input_tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
+    echo -e "  ${C_RED}❌ Token kosong atau tidak valid.${C_RESET}" >&2
+    sleep 1
+    echo ""
+    return
+  fi
+
+  printf '%s' "$input_tok" > .token.secret
+  echo "" >&2
+  echo -e "  ${C_GREEN}✅ Token disimpan ke .token.secret${C_RESET}" >&2
+  echo -e "  ${C_DIM}   File ini gitignored — aman, tidak ke-upload ke GitHub${C_RESET}" >&2
+  echo "" >&2
+  sleep 1
+  echo "$input_tok"
+}
+
+# ===== Layar input token manual =====
+screen_manual_token() {
+  clear 2>/dev/null || true
+  echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}" >&2
+  echo -e "${C_BOLD}║        🔐  INPUT TOKEN MANUAL — BANG WILY        ║${C_RESET}" >&2
+  echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
+  echo "" >&2
+  echo -e "${C_DIM}  Pastikan token punya scope: ${C_BOLD}repo${C_RESET}${C_DIM} (full control)${C_RESET}" >&2
+  echo "" >&2
+  echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
+  printf "${C_BOLD}  Paste token kamu ▸ ${C_RESET}" >&2
+
+  local input_tok=""
+  read -rs input_tok </dev/tty
+  echo "" >&2
+  input_tok=$(echo "$input_tok" | tr -d '\n\r ')
+
+  if [ -z "$input_tok" ] || echo "$input_tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
+    echo -e "  ${C_RED}❌ Token kosong atau tidak valid.${C_RESET}" >&2
+    sleep 1
+    echo ""
+    return
+  fi
+
+  printf '%s' "$input_tok" > .token.secret
+  echo "" >&2
+  echo -e "  ${C_GREEN}✅ Token disimpan ke .token.secret${C_RESET}" >&2
+  echo -e "  ${C_DIM}   File ini gitignored — aman, tidak ke-upload ke GitHub${C_RESET}" >&2
+  echo "" >&2
+  sleep 1
+  echo "$input_tok"
+}
+
 # ===== Baca token =====
 # Urutan prioritas:
 #   1. .token.secret  → file token asli (GITIGNORED, aman)
-#   2. .token         → hanya berisi contoh/tutorial (aman di-upload ke GitHub)
+#   2. Belum ada → tampilkan menu pilihan
 setup_token() {
   local tok=""
 
@@ -67,50 +169,45 @@ setup_token() {
     tok=$(tr -d '\n\r ' < .token.secret)
   fi
 
-  # Kalau masih kosong atau placeholder, tanya interaktif
-  # Semua echo diarahkan ke stderr (&2) biar tidak tertelan command substitution
-  if [ -z "$tok" ] || echo "$tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
+  # Kalau masih kosong atau placeholder, tampilkan menu
+  while [ -z "$tok" ] || echo "$tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; do
     clear 2>/dev/null || true
     echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}" >&2
     echo -e "${C_BOLD}║        🔐  SETUP TOKEN GITHUB — BANG WILY        ║${C_RESET}" >&2
     echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
     echo "" >&2
-    echo -e "${C_YELLOW}⚠️  File .token.secret belum ada!${C_RESET}" >&2
+    echo -e "${C_YELLOW}⚠️  Token GitHub belum ada / tidak valid.${C_RESET}" >&2
     echo -e "${C_DIM}   Token dibutuhkan agar script bisa push ke GitHub.${C_RESET}" >&2
     echo "" >&2
-    echo -e "${C_BOLD}Cara dapat token (sekali aja):${C_RESET}" >&2
-    echo -e "  ${C_CYAN}1.${C_RESET} Buka  → ${C_BLUE}https://github.com/settings/tokens${C_RESET}" >&2
-    echo -e "  ${C_CYAN}2.${C_RESET} Klik  → ${C_BOLD}Generate new token (classic)${C_RESET}" >&2
-    echo -e "  ${C_CYAN}3.${C_RESET} Centang scope ${C_BOLD}repo${C_RESET} (full control) → Generate" >&2
-    echo -e "  ${C_CYAN}4.${C_RESET} Copy token-nya → paste di bawah" >&2
-    echo "" >&2
     echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
-    printf "${C_BOLD}  Paste token kamu ▸ ${C_RESET}" >&2
-
-    # Sembunyikan input (seperti password), baca dari terminal langsung
-    local input_tok=""
-    read -rs input_tok </dev/tty
+    echo -e "  ${C_GREEN}1${C_RESET} Generate token otomatis ${C_DIM}(buka GitHub, scope repo sudah terisi)${C_RESET}" >&2
+    echo -e "  ${C_CYAN}2${C_RESET} Input token manual ${C_DIM}(sudah punya token)${C_RESET}" >&2
+    echo -e "  ${C_RED}0${C_RESET} Batal / keluar" >&2
     echo "" >&2
+    printf "${C_BOLD}  Pilih [1/2/0] ▸ ${C_RESET}" >&2
 
-    input_tok=$(echo "$input_tok" | tr -d '\n\r ')
+    local pick=""
+    read -r pick </dev/tty
+    pick="${pick:-1}"
 
-    if [ -z "$input_tok" ] || echo "$input_tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
-      echo "" >&2
-      echo -e "  ${C_RED}❌ Token tidak valid / kosong. Script berhenti.${C_RESET}" >&2
-      echo -e "  ${C_DIM}   Jalankan lagi: bash push.sh${C_RESET}" >&2
-      exit 1
-    fi
-
-    # Simpan ke .token.secret
-    printf '%s' "$input_tok" > .token.secret
-    echo "" >&2
-    echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
-    echo -e "  ${C_GREEN}✅ Token berhasil disimpan ke .token.secret${C_RESET}" >&2
-    echo -e "  ${C_DIM}   File ini gitignored — aman, tidak ke-upload ke GitHub${C_RESET}" >&2
-    echo "" >&2
-    sleep 1
-    tok="$input_tok"
-  fi
+    case "$pick" in
+      1)
+        tok=$(screen_generate_token)
+        ;;
+      2)
+        tok=$(screen_manual_token)
+        ;;
+      0|q|Q|exit)
+        echo -e "\n${C_YELLOW}Dibatalkan.${C_RESET}" >&2
+        exit 0
+        ;;
+      *)
+        echo -e "  ${C_RED}Pilihan tidak valid.${C_RESET}" >&2
+        sleep 1
+        tok=""
+        ;;
+    esac
+  done
 
   echo "$tok"
 }
