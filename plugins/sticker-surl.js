@@ -2,7 +2,17 @@ import axios from 'axios';
 import FormData from 'form-data';
 import { fileTypeFromBuffer } from 'file-type';
 
+// Helper: cek apakah error berasal dari socket/koneksi putus (undici / node fetch)
+const isNetworkAbort = (e) =>
+        e?.code === 'UND_ERR_SOCKET' ||
+        e?.cause?.code === 'UND_ERR_SOCKET' ||
+        e?.message === 'terminated' ||
+        e?.message?.includes('other side closed') ||
+        e?.message?.includes('socket hang up') ||
+        e?.type === 'system';
+
 let handler = async (m, { conn, text }) => {
+  try {
         const urlRegex = /https?:\/\/[^\s]+/i;
         const urlMatch = text && text.match(urlRegex);
 
@@ -22,6 +32,7 @@ let handler = async (m, { conn, text }) => {
                                 media = await conn.downloadM(stickerData, 'sticker');
                         }
                 } catch (e) {
+                        if (isNetworkAbort(e)) return m.reply('❌ Koneksi ke server stiker terputus, coba lagi.');
                         return m.reply(`❌ Gagal download stiker.\nError: ${e.message}`);
                 }
 
@@ -42,6 +53,7 @@ let handler = async (m, { conn, text }) => {
                         });
                         uploadRes = res.data;
                 } catch (e) {
+                        if (isNetworkAbort(e)) return m.reply('❌ Koneksi ke CDN terputus saat upload, coba lagi.');
                         return m.reply(`❌ Gagal upload ke CDN.\nError: ${e.message}`);
                 }
 
@@ -64,6 +76,7 @@ let handler = async (m, { conn, text }) => {
                         });
                         buf = Buffer.from(res.data);
                 } catch (e) {
+                        if (isNetworkAbort(e)) return m.reply('❌ Koneksi terputus saat download, coba lagi.');
                         const status = e.response?.status;
                         if (status === 403) return m.reply('❌ URL diblokir (403 Forbidden).');
                         if (status === 404) return m.reply('❌ URL tidak ditemukan (404).');
@@ -88,6 +101,12 @@ let handler = async (m, { conn, text }) => {
                         '.surl https://cdn.ornzora.eu.cc/502784e6-108d-49d7-a981-04083d14ad9a-FIORA.webp'
                 );
         }
+  } catch (e) {
+        // Jaring terakhir — tangkap error socket/network yang lolos dari try/catch dalam
+        if (isNetworkAbort(e)) return m.reply('❌ Koneksi terputus, coba lagi.').catch(() => {});
+        console.error('[surl] uncaught error:', e.message);
+        return m.reply(`❌ Terjadi kesalahan: ${e.message}`).catch(() => {});
+  }
 };
 
 handler.help = ['surl', 'surl <url>'];
