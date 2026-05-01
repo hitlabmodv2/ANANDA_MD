@@ -115,7 +115,68 @@ setup_token() {
   echo "$tok"
 }
 
+# ===== Validasi token ke GitHub API secara real-time =====
+# Cek apakah token benar-benar valid/aktif sebelum lanjut.
+# Return 0 = valid, 1 = invalid/expired, 2 = tidak bisa cek (network error)
+validate_token() {
+  local tok="$1"
+  local response http_code login rate_limit
+
+  echo -e "${C_DIM}  🔄 Memvalidasi token ke GitHub...${C_RESET}" >&2
+
+  response=$(curl -s -o /tmp/_gh_validate.json -w "%{http_code}" \
+    -H "Authorization: token ${tok}" \
+    -H "Accept: application/vnd.github+json" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    "https://api.github.com/user" 2>/dev/null)
+  http_code="$response"
+
+  case "$http_code" in
+    200)
+      login=$(grep -o '"login":"[^"]*"' /tmp/_gh_validate.json 2>/dev/null | head -1 | sed 's/"login":"//;s/"//')
+      rate_limit=$(grep -o '"X-RateLimit-Remaining":"[^"]*"' /tmp/_gh_validate.json 2>/dev/null | head -1 | sed 's/.*":"//;s/"//')
+      echo -e "  ${C_GREEN}✅ Token valid!${C_RESET} Login sebagai: ${C_BOLD}${login}${C_RESET}" >&2
+      rm -f /tmp/_gh_validate.json
+      return 0
+      ;;
+    401)
+      echo "" >&2
+      echo -e "  ${C_RED}❌ Token TIDAK valid atau sudah expired!${C_RESET}" >&2
+      echo -e "  ${C_DIM}   HTTP 401 Unauthorized dari GitHub API.${C_RESET}" >&2
+      echo -e "  ${C_DIM}   Hapus .token.secret dan jalankan push.sh lagi untuk input token baru.${C_RESET}" >&2
+      rm -f /tmp/_gh_validate.json .token.secret 2>/dev/null
+      return 1
+      ;;
+    403)
+      echo "" >&2
+      echo -e "  ${C_YELLOW}⚠️  Token valid tapi rate-limited atau permission kurang (HTTP 403).${C_RESET}" >&2
+      echo -e "  ${C_DIM}   Pastikan token punya scope: repo (full control).${C_RESET}" >&2
+      rm -f /tmp/_gh_validate.json
+      return 1
+      ;;
+    ""|000)
+      echo -e "  ${C_YELLOW}⚠️  Tidak bisa cek token (tidak ada koneksi internet / GitHub down).${C_RESET}" >&2
+      echo -e "  ${C_DIM}   Lanjut tanpa validasi...${C_RESET}" >&2
+      rm -f /tmp/_gh_validate.json
+      return 2
+      ;;
+    *)
+      echo -e "  ${C_YELLOW}⚠️  Respon GitHub tidak terduga (HTTP ${http_code}), lanjut...${C_RESET}" >&2
+      rm -f /tmp/_gh_validate.json
+      return 2
+      ;;
+  esac
+}
+
 TOKEN=$(setup_token)
+
+# Validasi token ke GitHub secara real-time
+validate_result=0
+validate_token "$TOKEN" || validate_result=$?
+if [ "$validate_result" -eq 1 ]; then
+  echo -e "\n${C_RED}Script berhenti. Jalankan lagi: bash push.sh${C_RESET}" >&2
+  exit 1
+fi
 
 REMOTE_URL="https://${USER}:${TOKEN}@github.com/${USER}/${REPO}.git"
 
