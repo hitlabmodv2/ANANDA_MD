@@ -1063,18 +1063,16 @@ push_head_to_branch() {
     local unblock_url
     unblock_url=$(grep -o 'https://github.com[^ ]*unblock-secret[^ ]*' "$push_log" 2>/dev/null | head -1)
     echo ""
-    echo -e "  ${C_RED}🔐 Push ditolak GitHub — Token rahasia terdeteksi di history commit!${C_RESET}"
+    echo -e "  ${C_RED}🔐 Push ditolak — GitHub menemukan token di history commit lama!${C_RESET}"
+    echo -e "  ${C_DIM}   (.token.secret kamu AMAN — bukan itu masalahnya)${C_RESET}"
     echo ""
-    echo -e "  ${C_BOLD}Solusi (2 langkah):${C_RESET}"
-    echo -e "  ${C_YELLOW}1.${C_RESET} Klik link ini untuk allow push:"
+    echo -e "  ${C_BOLD}✅ Solusi: klik link ini lalu pilih 'Allow secret'${C_RESET}"
     if [ -n "$unblock_url" ]; then
-      echo -e "     ${C_BLUE}${unblock_url}${C_RESET}"
+      echo -e "  ${C_BLUE}${unblock_url}${C_RESET}"
     else
-      echo -e "     ${C_DIM}Cek di: https://github.com/${USER}/${REPO}/security/secret-scanning${C_RESET}"
+      echo -e "  ${C_DIM}Cek di: https://github.com/${USER}/${REPO}/security/secret-scanning${C_RESET}"
     fi
-    echo -e "  ${C_YELLOW}2.${C_RESET} Ganti token lama (yang bocor) dengan token baru:"
-    echo -e "     ${C_DIM}→ https://github.com/settings/tokens${C_RESET}"
-    echo -e "     ${C_DIM}→ lalu: echo 'ghp_TOKEN_BARU' > .token.secret${C_RESET}"
+    echo -e "  ${C_DIM}   Setelah allow → jalankan push.sh lagi, langsung bisa.${C_RESET}"
     echo ""
   else
     echo -e "  ${C_RED}❌ Gagal push ke ${branch}${C_RESET}"
