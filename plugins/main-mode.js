@@ -12,8 +12,8 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                         settings.pconly = false;
                         m.reply(
                                 `✅ *Mode PUBLIC* aktif\n\n` +
-                                `- Bot respon ke semua orang\n` +
-                                `- Private chat & Grup aktif`
+                                `- Siapa: semua orang\n` +
+                                `- Tempat: private chat & grup`
                         );
                         break;
 
@@ -23,8 +23,8 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                         settings.pconly = false;
                         m.reply(
                                 `✅ *Mode SELF* aktif\n\n` +
-                                `- Bot hanya respon ke owner\n` +
-                                `- Private chat & Grup aktif`
+                                `- Siapa: owner saja\n` +
+                                `- Tempat: private chat & grup`
                         );
                         break;
 
@@ -35,8 +35,8 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                         settings.pconly = false;
                         m.reply(
                                 `✅ *Mode GROUP* aktif\n\n` +
-                                `- Bot respon ke semua orang\n` +
-                                `- Khusus Grup saja (private diabaikan)`
+                                `- Siapa: semua orang\n` +
+                                `- Tempat: grup saja (private diabaikan)`
                         );
                         break;
 
@@ -47,8 +47,8 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                         settings.pconly = true;
                         m.reply(
                                 `✅ *Mode PRIVATE* aktif\n\n` +
-                                `- Bot respon ke semua orang\n` +
-                                `- Khusus Private saja (grup diabaikan)`
+                                `- Siapa: semua orang\n` +
+                                `- Tempat: private saja (grup diabaikan)`
                         );
                         break;
 
@@ -63,14 +63,24 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                                         : settings.pconly
                                                 ? '💬 PRIVATE'
                                                 : '🌐 PUBLIC';
+
+                        const modeDesc = !settings.public
+                                ? 'Owner saja — bisa di private & grup'
+                                : settings.gconly
+                                        ? 'Semua orang — khusus grup saja, private diabaikan'
+                                        : settings.pconly
+                                                ? 'Semua orang — khusus private saja, grup diabaikan'
+                                                : 'Semua orang — private & grup aktif';
+
                         m.reply(
-                                `*Mode Bot Saat Ini:* ${modeLabel}\n\n` +
+                                `*Mode Bot Saat Ini:* ${modeLabel}\n` +
+                                `*Keterangan:* ${modeDesc}\n\n` +
                                 `*Pilihan mode:*\n` +
-                                `- ${usedPrefix}mode public  → semua orang, private + grup\n` +
-                                `- ${usedPrefix}mode self    → owner only, private + grup\n` +
-                                `- ${usedPrefix}mode gc      → semua orang, grup saja\n` +
-                                `- ${usedPrefix}mode pc      → semua orang, private saja\n` +
-                                `- ${usedPrefix}mode status  → cek mode sekarang`
+                                `- ${usedPrefix}mode public → semua orang, private & grup\n` +
+                                `- ${usedPrefix}mode self   → owner saja, private & grup\n` +
+                                `- ${usedPrefix}mode gc     → semua orang, grup saja\n` +
+                                `- ${usedPrefix}mode pc     → semua orang, private saja\n` +
+                                `- ${usedPrefix}mode status → cek mode sekarang`
                         );
                         break;
         }
