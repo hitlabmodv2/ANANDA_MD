@@ -16,6 +16,7 @@ export async function handler(chatUpdate) {
         let m = chatUpdate.messages[chatUpdate.messages.length - 1];
         if (!m) return;
         if (global.db.data == null) await global.loadDatabase();
+        let _blocked = false;
         try {
                 m = smsg(this, m) || m;
                 if (!m) return;
@@ -31,8 +32,8 @@ export async function handler(chatUpdate) {
                 const isOwner = isROwner || m.fromMe;
                 const isPrems = isROwner || db.data.users[m.sender]?.premiumTime > 0;
 
-                if (global.db.data.settings[this.user.jid].gconly && !m.isGroup && !isOwner && !isPrems) return;
-                if (!global.db.data.settings[this.user.jid].public && !isOwner && !m.fromMe) return;
+                if (global.db.data.settings[this.user.jid].gconly && !m.isGroup && !isOwner && !isPrems) { _blocked = true; return; }
+                if (!global.db.data.settings[this.user.jid].public && !isOwner && !m.fromMe) { _blocked = true; return; }
                 
                 if(await nsfwchecker(m, conn)) return
                 
@@ -296,7 +297,7 @@ export async function handler(chatUpdate) {
                         }
                 }
 
-                if (global.db.data.settings[this.user.jid]?.autoread) await conn.readMessages([m.key]);
+                if (!_blocked && global.db.data.settings[this.user.jid]?.autoread) await conn.readMessages([m.key]);
         }
 }
 
