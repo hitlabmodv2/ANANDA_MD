@@ -417,9 +417,10 @@ show_main_menu() {
   echo -e "  ${C_GREEN}1${C_RESET} upload script ${C_DIM}(pilih branch tujuan)${C_RESET}"
   echo -e "  ${C_CYAN}2${C_RESET} buat branch baru"
   echo -e "  ${C_YELLOW}3${C_RESET} hapus branch ${C_DIM}(default dilindungi)${C_RESET}"
+  echo -e "  ${C_MAGENTA}4${C_RESET} ganti default branch ${C_DIM}(sekarang: ${DEFAULT_BRANCH})${C_RESET}"
   echo -e "  ${C_RED}0${C_RESET} keluar"
   echo ""
-  printf "${C_BOLD}Pilih [0/1/2/3] ▸ ${C_RESET}"
+  printf "${C_BOLD}Pilih [0/1/2/3/4] ▸ ${C_RESET}"
 
   local pick
   read -r pick
@@ -429,12 +430,80 @@ show_main_menu() {
     1) show_menu; run_upload ;;
     2) action_create_branch ;;
     3) action_delete_branch ;;
+    4) action_switch_default ;;
     0|q|Q|exit) goodbye_prompt ;;
     *)
       echo -e "${C_RED}✖ Pilihan tidak valid: '${pick}'${C_RESET}"
       sleep 1
       ;;
   esac
+}
+
+# ===== Action: ganti default branch =====
+action_switch_default() {
+  banner
+  echo -e "${C_BOLD}🔀 Ganti Default Branch${C_RESET}"
+  echo -e "${C_DIM}Default sekarang: ${C_GREEN}${DEFAULT_BRANCH}${C_RESET}"
+  echo ""
+
+  local branches=()
+  while IFS= read -r b; do
+    [ -n "$b" ] && [ "$b" != "$DEFAULT_BRANCH" ] && branches+=("$b")
+  done < <(fetch_branches)
+
+  local total=${#branches[@]}
+  if [ "$total" -eq 0 ]; then
+    echo -e "${C_YELLOW}ℹ️  Tidak ada branch lain yang tersedia.${C_RESET}"
+    echo ""
+    echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
+    printf "${C_BOLD}▸ ${C_RESET}"
+    read -r
+    return
+  fi
+
+  echo -e "${C_DIM}Pilih branch yang akan jadi default baru:${C_RESET}"
+  echo ""
+  local i=1
+  for b in "${branches[@]}"; do
+    printf "  ${C_CYAN}%2d${C_RESET} %s\n" "$i" "$b"
+    i=$((i + 1))
+  done
+  echo ""
+  echo -e "  ${C_RED} 0${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
+  echo ""
+  printf "${C_BOLD}Pilih [1-${total}] ▸ ${C_RESET}"
+
+  local pick
+  read -r pick
+  pick="${pick:-0}"
+
+  if [ "$pick" = "0" ]; then
+    echo -e "${C_YELLOW}↩ Kembali ke menu.${C_RESET}"
+    sleep 1
+    return
+  fi
+
+  if ! echo "$pick" | grep -qE '^[0-9]+$' || [ "$pick" -lt 1 ] || [ "$pick" -gt "$total" ]; then
+    echo -e "${C_RED}✖ Pilihan tidak valid.${C_RESET}"
+    sleep 2
+    return
+  fi
+
+  local new_default="${branches[$((pick - 1))]}"
+  local old_default="$DEFAULT_BRANCH"
+  DEFAULT_BRANCH="$new_default"
+
+  # Update nilai DEFAULT_BRANCH di dalam push.sh itu sendiri secara permanen
+  sed -i "s|^DEFAULT_BRANCH=.*|DEFAULT_BRANCH=\"${new_default}\"|" "$0" 2>/dev/null || true
+
+  echo ""
+  echo -e "  ${C_GREEN}✅ Default branch berubah:${C_RESET}"
+  echo -e "     ${C_DIM}${old_default}${C_RESET} ${C_BOLD}→${C_RESET} ${C_GREEN}${new_default}${C_RESET}"
+  echo -e "  ${C_DIM}Perubahan disimpan permanen di push.sh${C_RESET}"
+  echo ""
+  echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
+  printf "${C_BOLD}▸ ${C_RESET}"
+  read -r
 }
 
 # ===== Action: buat branch baru =====
