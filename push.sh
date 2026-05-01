@@ -32,7 +32,7 @@ USER="hitlabmodv2"
 REPO="ANANDA_MD"
 # DEFAULT_BRANCH di-auto-detect realtime dari GitHub (lihat detect_default_branch).
 # Nilai di sini cuma fallback kalau koneksi ke GitHub bermasalah.
-DEFAULT_BRANCH="main"
+DEFAULT_BRANCH="HONOLULU_AI_V1_2_TSUNDERE"
 
 # Branch yang disembunyikan dari menu (system / internal).
 # Pisahkan dengan spasi. Contoh: "replit-agent gh-pages backup"
@@ -418,9 +418,10 @@ show_main_menu() {
   echo -e "  ${C_CYAN}2${C_RESET} buat branch baru"
   echo -e "  ${C_YELLOW}3${C_RESET} hapus branch ${C_DIM}(default dilindungi)${C_RESET}"
   echo -e "  ${C_MAGENTA}4${C_RESET} ganti default branch ${C_DIM}(sekarang: ${DEFAULT_BRANCH})${C_RESET}"
+  echo -e "  ${C_BLUE}5${C_RESET} rename repository ${C_DIM}(sekarang: ${REPO})${C_RESET}"
   echo -e "  ${C_RED}0${C_RESET} keluar"
   echo ""
-  printf "${C_BOLD}Pilih [0/1/2/3/4] ▸ ${C_RESET}"
+  printf "${C_BOLD}Pilih [0/1/2/3/4/5] ▸ ${C_RESET}"
 
   local pick
   read -r pick
@@ -431,12 +432,108 @@ show_main_menu() {
     2) action_create_branch ;;
     3) action_delete_branch ;;
     4) action_switch_default ;;
+    5) action_rename_repo ;;
     0|q|Q|exit) goodbye_prompt ;;
     *)
       echo -e "${C_RED}✖ Pilihan tidak valid: '${pick}'${C_RESET}"
       sleep 1
       ;;
   esac
+}
+
+# ===== Action: rename repository =====
+action_rename_repo() {
+  banner
+  echo -e "${C_BOLD}✏️  Rename Repository${C_RESET}"
+  echo -e "${C_DIM}Nama sekarang: ${C_CYAN}${USER}/${REPO}${C_RESET}"
+  echo ""
+  echo -e "  ${C_RED}0${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
+  echo ""
+  printf "${C_BOLD}Nama baru untuk repository ▸ ${C_RESET}"
+
+  local new_name
+  read -r new_name
+  new_name=$(echo "$new_name" | tr -d '[:space:]')
+
+  if [ -z "$new_name" ] || [ "$new_name" = "0" ]; then
+    echo -e "${C_YELLOW}↩ Kembali ke menu.${C_RESET}"
+    sleep 1
+    return
+  fi
+
+  # Validasi: hanya huruf, angka, - dan _
+  if ! echo "$new_name" | grep -qE '^[a-zA-Z0-9_-]+$'; then
+    echo -e "${C_RED}✖ Nama tidak valid${C_RESET} ${C_DIM}(hanya huruf, angka, - dan _)${C_RESET}"
+    sleep 2
+    return
+  fi
+
+  if [ "$new_name" = "$REPO" ]; then
+    echo -e "${C_YELLOW}ℹ️  Nama sama seperti sekarang, tidak ada yang diubah.${C_RESET}"
+    sleep 2
+    return
+  fi
+
+  # Konfirmasi
+  echo ""
+  echo -e "${C_RED}⚠️  Yakin rename repository?${C_RESET}"
+  echo -e "     ${C_DIM}${USER}/${REPO}${C_RESET} ${C_BOLD}→${C_RESET} ${C_GREEN}${USER}/${new_name}${C_RESET}"
+  echo -e "  ${C_DIM}Remote URL akan otomatis diperbarui di lokal juga.${C_RESET}"
+  echo ""
+  echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}lanjut rename${C_RESET}"
+  echo -e "  ${C_RED}0${C_RESET} ${C_DIM}batal${C_RESET}"
+  printf "${C_BOLD}Konfirmasi ▸ ${C_RESET}"
+  local confirm
+  read -r confirm
+  if [ "$confirm" != "1" ]; then
+    echo -e "${C_YELLOW}↩ Dibatalkan.${C_RESET}"
+    sleep 1
+    return
+  fi
+
+  echo ""
+  echo -e "  ${C_CYAN}▸${C_RESET} Menghubungi GitHub API untuk rename repo..."
+
+  local api_http
+  api_http=$(curl -s -o /tmp/_gh_rename.json -w "%{http_code}" \
+    -X PATCH \
+    -H "Authorization: token ${TOKEN}" \
+    -H "Accept: application/vnd.github+json" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    "https://api.github.com/repos/${USER}/${REPO}" \
+    -d "{\"name\":\"${new_name}\"}" 2>/dev/null)
+
+  if [ "$api_http" = "200" ]; then
+    local old_repo="$REPO"
+    REPO="$new_name"
+
+    # Update REPO di push.sh secara permanen
+    sed -i "s|^REPO=.*|REPO=\"${new_name}\"|" "$0" 2>/dev/null || true
+
+    # Update remote URL lokal agar tidak putus
+    local new_url="https://${USER}:${TOKEN}@github.com/${USER}/${new_name}.git"
+    git remote set-url origin "$new_url" 2>/dev/null || true
+
+    echo ""
+    echo -e "  ${C_GREEN}✅ Repository berhasil di-rename di GitHub!${C_RESET}"
+    echo -e "     ${C_DIM}${USER}/${old_repo}${C_RESET} ${C_BOLD}→${C_RESET} ${C_GREEN}${USER}/${new_name}${C_RESET}"
+    echo -e "  ${C_BLUE}🔗 https://github.com/${USER}/${new_name}${C_RESET}"
+    echo -e "  ${C_DIM}Remote URL lokal sudah diperbarui otomatis.${C_RESET}"
+    echo -e "  ${C_DIM}Perubahan nama disimpan permanen di push.sh${C_RESET}"
+  else
+    local api_msg
+    api_msg=$(grep -o '"message":"[^"]*"' /tmp/_gh_rename.json 2>/dev/null | head -1 | sed 's/"message":"//;s/"//')
+    echo ""
+    echo -e "  ${C_RED}❌ Gagal rename repository (HTTP ${api_http})${C_RESET}"
+    [ -n "$api_msg" ] && echo -e "  ${C_DIM}   GitHub: ${api_msg}${C_RESET}"
+    echo -e "  ${C_DIM}   Pastikan token punya permission: delete_repo atau repo (full)${C_RESET}"
+  fi
+
+  rm -f /tmp/_gh_rename.json
+  echo ""
+  echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
+  printf "${C_BOLD}▸ ${C_RESET}"
+  read -r
 }
 
 # ===== Action: ganti default branch =====
