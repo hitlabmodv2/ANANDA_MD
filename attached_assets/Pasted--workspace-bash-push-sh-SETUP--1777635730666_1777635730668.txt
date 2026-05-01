@@ -40,5 +40,3 @@ Langkah di GitHub:
   1. Di kolom Expiration → pilih No expiration
   2. Klik Generate token (tombol hijau, paling bawah)
   3. Copy token yang muncul → paste di sini
-
-─────────────────────────────────────────────────
