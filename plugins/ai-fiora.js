@@ -1399,9 +1399,10 @@ async function toPdf(buffer) {
 
 const upload = async (msg) => {
   if (!msg || !isMedia.test(msg.mtype)) return null
+  if (!msg.mediaType) return null
 
   const buffer = await msg.download()
-  if (!buffer) return null
+  if (!buffer || buffer.length === 0) return null
 
   const type = await fileTypeFromBuffer(buffer)
 
@@ -1481,7 +1482,8 @@ size: ${buffer.length} bytes`,
   }
 
   const mFile = await upload(m)
-  const qFile = m.quoted ? await upload(m.quoted) : null
+  const qMsg = m.quoted
+  const qFile = qMsg ? await upload(qMsg) : null
   const time = getWIBDateTime() 
 
   const userBlock = `========== USER ==========

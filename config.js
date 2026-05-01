@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { Button, AIRich } from './lib/MessageBuilder.js';
 
 global.pairingNumber = 6289667923162;
-global.owner = [['6282139672290','Nixel', true], ['6289688206739','BangWily', true]];
+global.owner = [['62821396722911111','Nixel', true], ['6289688206739','BangWily', true]];
 
 global.namebot = 'Honolulu Ai';
 global.author = 'Nixel';
