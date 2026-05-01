@@ -91,6 +91,76 @@ function findStickerMeta(url) {
   return HONOLULU_STICKERS.find(s => s.url === url) || null;
 }
 
+// Pasangan FIORA ↔ HONOLULU per emosi yang sama
+// Key = URL FIORA, Value = URL HONOLULU penggantinya
+const STICKER_VARIANT_MAP = {
+  // 1 malu nutup muka
+  "https://cdn.ornzora.eu.cc/502784e6-108d-49d7-a981-04083d14ad9a-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/a44ce53e-6b1e-4a7f-b5cd-e60ee2d285bf-HONOLULU.webp",
+  // 2 senyum kecil
+  "https://cdn.ornzora.eu.cc/89067324-1a1e-4b51-a379-cdb50e8cd30d-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/6853b306-6f51-47f4-8b7a-694a6c4ed618-HONOLULU.webp",
+  // 3 datar / blank stare
+  "https://cdn.ornzora.eu.cc/91b84f91-7d92-4850-a743-c0554439861d-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/ba453a09-aabd-4483-9ca1-0ef1b66f34c1-HONOLULU.webp",
+  // 4 ceria ringan
+  "https://cdn.ornzora.eu.cc/873d7ed5-c36c-43d7-a5ba-0d0acfd73eb8-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/fbcea89f-580c-4f52-970f-2e1fa44abdce-HONOLULU.webp",
+  // 5 smug / puas
+  "https://cdn.ornzora.eu.cc/e1ab519c-7a03-4246-8cd9-2cfd623247b8-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/31f63a4b-95a8-440a-9d77-9d634ef2153a-HONOLULU.webp",
+  // 6 mikir / skeptis
+  "https://cdn.ornzora.eu.cc/5baac1a3-ca2b-4749-a08c-5eabfd418e79-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/a4bbcdf7-0c78-4d43-93e2-f0ebad7d1bf6-HONOLULU.webp",
+  // 7 kaget positif
+  "https://cdn.ornzora.eu.cc/4d58a123-ad35-4bb2-9353-8e3e23c6d0c8-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/b371232a-5655-4341-985f-90aa4efcc9c4-HONOLULU.webp",
+  // 8 malu + gugup
+  "https://cdn.ornzora.eu.cc/b7df2441-2731-427d-ba44-e88e1f5275e4-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/2203539e-dfc0-4bd7-b4bf-e0ad72385c02-HONOLULU.webp",
+  // 9 jahil / ngejek
+  "https://cdn.ornzora.eu.cc/6adbf4a3-07ce-47c8-9dbd-31efce9d0dfe-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/3d3b9600-910a-452e-b567-922c193b9bbb-HONOLULU.webp",
+  // 10 malu berat / flustered
+  "https://cdn.ornzora.eu.cc/9138434c-7338-4f66-9b40-574179b5b072-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/98de1e26-b28f-42a7-a6f1-c769ddf1e6eb-HONOLULU.webp",
+  // 11 ngamuk lucu
+  "https://cdn.ornzora.eu.cc/6f805809-c16a-4521-bfdf-92ca7d20c6b4-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/dd1de830-8664-490d-96c4-cc199bddb284-HONOLULU.webp",
+  // 12 kesel lucu
+  "https://cdn.ornzora.eu.cc/997a0eb7-090a-404f-9b47-fa84f136705c-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/41f054d0-55e9-4d1a-abb7-6a49ac74769b-HONOLULU.webp",
+  // 13 datar / males respon
+  "https://cdn.ornzora.eu.cc/57a1045e-48bb-4535-bece-d7bf5e750943-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/0e5ac3ba-8326-46ab-947c-fb03374207f6-HONOLULU.webp",
+  // 14 chaotic / zamn
+  "https://cdn.ornzora.eu.cc/249f7a66-906f-4adc-b78f-eca20e4807b7-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/c3de99b6-bf96-46f6-bef7-d929c6399175-HONOLULU.webp",
+  // 15 mikir + sedikit kesel
+  "https://cdn.ornzora.eu.cc/7fce094a-28c8-443f-8602-9be9518d5369-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/85d768a4-fedb-4f1f-8e21-86254fcd6049-HONOLULU.webp",
+  // 17 capek total / drop
+  "https://cdn.ornzora.eu.cc/390fadb4-0548-4978-8dc3-f4ee398a31e9-FIORA.webp":
+    "https://cdn.ornzora.eu.cc/4f528082-cccc-46ad-839c-d31dc19888a7-HONOLULU.webp",
+};
+
+// Balik map: HONOLULU → FIORA (biar dua arah — kalau AI kirim HONOLULU, bisa juga swap ke FIORA)
+const STICKER_VARIANT_REVERSE = Object.fromEntries(
+  Object.entries(STICKER_VARIANT_MAP).map(([f, h]) => [h, f])
+);
+
+/**
+ * Secara acak memilih antara versi FIORA atau HONOLULU untuk emosi yang sama.
+ * Kalau URL tidak punya pasangan → kembalikan URL asli (tidak berubah).
+ * @param {string} url - URL stiker dari AI response
+ * @returns {string} URL stiker yang dipilih
+ */
+function resolveVariantUrl(url) {
+  const partner = STICKER_VARIANT_MAP[url] || STICKER_VARIANT_REVERSE[url];
+  if (!partner) return url;
+  return Math.random() < 0.5 ? url : partner;
+}
+
 function trackStickerUsage(url, chatJid, senderJid) {
   if (!global.db.data.msgs) global.db.data.msgs = {};
   if (!global.db.data.msgs.honolulu_sticker_stats) {
@@ -600,11 +670,12 @@ async function fioraResponse(response, conn, m, { startThinking }) {
       }
 
       if (mediaType === "sticker") {
-        const { data, mime } = await conn.getFile(url);
+        const finalUrl = resolveVariantUrl(url);
+        const { data, mime } = await conn.getFile(finalUrl);
                         const exif = { packName: global.stickpack, packPublish: global.stickauth };
                         const sticker = await (await import('../lib/exif.js')).writeExif({ mimetype: mime, data }, exif);
                         await conn.sendMessage(m.chat, { sticker }, { quoted: m, messageId: generateFioraID() });
-                        try { trackStickerUsage(url, m.chat, m.sender); } catch(e) {}
+                        try { trackStickerUsage(finalUrl, m.chat, m.sender); } catch(e) {}
       }
 
       if (mediaType === "audio") {
