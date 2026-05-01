@@ -10,7 +10,9 @@ let handler = async (m, { conn, text }) => {
         if (m.quoted && m.quoted.mtype === 'stickerMessage') {
                 await m.reply('⏳ Mengambil URL stiker...');
 
-                const media = await m.quoted.download();
+                const media = await conn.downloadM(m.quoted.msg || m.quoted, 'sticker');
+                if (!media || media.length === 0) return m.reply('❌ Gagal membaca data stiker.');
+
                 const type = await fileTypeFromBuffer(media);
                 const ext = type?.ext || 'webp';
                 const filename = `SURL_${Date.now()}.${ext}`;
