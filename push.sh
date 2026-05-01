@@ -93,7 +93,7 @@ screen_generate_token() {
   _ALL_SCOPES="${_ALL_SCOPES},project,read:project"
   _ALL_SCOPES="${_ALL_SCOPES},admin:gpg_key,write:gpg_key,read:gpg_key"
   _ALL_SCOPES="${_ALL_SCOPES},admin:ssh_signing_key,write:ssh_signing_key,read:ssh_signing_key"
-  local TOKEN_URL="https://github.com/settings/tokens/new?description=BangWilyPushScript&scopes=${_ALL_SCOPES}"
+  local _BASE_URL="https://github.com/settings/tokens/new?description=BangWilyPushScript&scopes=${_ALL_SCOPES}"
 
   # ── Pilih Expiration ──
   clear 2>/dev/null || true
@@ -110,16 +110,19 @@ screen_generate_token() {
   echo "" >&2
   printf "${C_BOLD}  Pilih [1/2/3/4] ▸ ${C_RESET}" >&2
 
-  local exp_pick="" exp_label=""
+  local exp_pick="" exp_label="" exp_param=""
   read -r exp_pick </dev/tty
   exp_pick="${exp_pick:-1}"
 
+  # URL dibangun SETELAH pilihan expiration agar parameter &expiration= ikut terkirim ke GitHub
   case "$exp_pick" in
-    2) exp_label="1 tahun (365 hari)" ;;
-    3) exp_label="90 hari" ;;
-    4) exp_label="30 hari" ;;
-    *) exp_pick="1"; exp_label="No expiration" ;;
+    2) exp_label="1 tahun (365 hari)"; exp_param="365" ;;
+    3) exp_label="90 hari";            exp_param="90"  ;;
+    4) exp_label="30 hari";            exp_param="30"  ;;
+    *) exp_pick="1"; exp_label="No expiration"; exp_param="no_expiry" ;;
   esac
+
+  local TOKEN_URL="${_BASE_URL}&expiration=${exp_param}"
 
   # ── Buka browser & tampilkan instruksi ──
   clear 2>/dev/null || true
@@ -128,6 +131,7 @@ screen_generate_token() {
   echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
   echo "" >&2
   echo -e "${C_DIM}  Semua scope sudah tercentang • nama token sudah terisi${C_RESET}" >&2
+  echo -e "${C_DIM}  Expiration sudah di-set: ${C_RESET}${C_GREEN}${C_BOLD}${exp_label}${C_RESET}" >&2
   echo "" >&2
 
   if open_url "$TOKEN_URL"; then
@@ -143,7 +147,8 @@ screen_generate_token() {
   echo "" >&2
   echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
   echo -e "${C_BOLD}Langkah di GitHub:${C_RESET}" >&2
-  echo -e "  ${C_CYAN}1.${C_RESET} Di kolom ${C_BOLD}Expiration${C_RESET} → pilih ${C_GREEN}${C_BOLD}${exp_label}${C_RESET}" >&2
+  echo -e "  ${C_CYAN}1.${C_RESET} Pastikan kolom ${C_BOLD}Expiration${C_RESET} sudah menampilkan ${C_GREEN}${C_BOLD}${exp_label}${C_RESET}" >&2
+  echo -e "       ${C_YELLOW}(GitHub default 30 hari — cek & ubah kalau perlu!)${C_RESET}" >&2
   echo -e "  ${C_CYAN}2.${C_RESET} Klik ${C_BOLD}Generate token${C_RESET} (tombol hijau, paling bawah)" >&2
   echo -e "  ${C_CYAN}3.${C_RESET} Copy token yang muncul → paste di sini" >&2
   echo "" >&2
