@@ -187,9 +187,20 @@ while true; do
     exit 1
   fi
 
+  clear 2>/dev/null || true
+  echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}" >&2
+  echo -e "${C_BOLD}║        🔐  TOKEN TIDAK VALID — COBA LAGI         ║${C_RESET}" >&2
+  echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
   echo "" >&2
-  echo -e "${C_YELLOW}🔁 Silakan masukkan token GitHub yang baru:${C_RESET}" >&2
-  printf "${C_BOLD}  Paste token kamu ▸ ${C_RESET}" >&2
+  echo -e "${C_DIM}  Percobaan ke-${_token_attempts} dari 3${C_RESET}" >&2
+  echo "" >&2
+  echo -e "${C_BOLD}Cara dapat token baru:${C_RESET}" >&2
+  echo -e "  ${C_CYAN}1.${C_RESET} Buka  → ${C_BLUE}https://github.com/settings/tokens${C_RESET}" >&2
+  echo -e "  ${C_CYAN}2.${C_RESET} Klik  → ${C_BOLD}Generate new token (classic)${C_RESET}" >&2
+  echo -e "  ${C_CYAN}3.${C_RESET} Centang scope ${C_BOLD}repo${C_RESET} → Generate → Copy" >&2
+  echo "" >&2
+  echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}" >&2
+  printf "${C_BOLD}  Paste token baru ▸ ${C_RESET}" >&2
   local_new_tok=""
   read -rs local_new_tok </dev/tty
   echo "" >&2
@@ -197,6 +208,7 @@ while true; do
 
   if [ -z "$local_new_tok" ] || echo "$local_new_tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
     echo -e "  ${C_RED}Token kosong atau placeholder, coba lagi.${C_RESET}" >&2
+    sleep 1
     continue
   fi
 
