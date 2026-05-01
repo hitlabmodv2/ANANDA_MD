@@ -70,16 +70,21 @@ setup_token() {
   # Kalau masih kosong atau placeholder, tanya interaktif
   if [ -z "$tok" ] || echo "$tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
     clear 2>/dev/null || true
-    echo -e "${C_BOLD}🔐 Setup Token GitHub${C_RESET}"
-    echo -e "${C_DIM}File .token.secret belum ada atau belum diisi.${C_RESET}"
+    echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}"
+    echo -e "${C_BOLD}║        🔐  SETUP TOKEN GITHUB — BANG WILY        ║${C_RESET}"
+    echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}"
     echo ""
-    echo -e "Cara dapat token:"
-    echo -e "  ${C_CYAN}1.${C_RESET} Buka ${C_BLUE}https://github.com/settings/tokens${C_RESET}"
-    echo -e "  ${C_CYAN}2.${C_RESET} Klik ${C_BOLD}Generate new token (classic)${C_RESET}"
-    echo -e "  ${C_CYAN}3.${C_RESET} Centang scope: ${C_BOLD}repo${C_RESET} (full control)"
-    echo -e "  ${C_CYAN}4.${C_RESET} Copy token → paste di bawah ini"
+    echo -e "${C_YELLOW}⚠️  File .token.secret belum ada!${C_RESET}"
+    echo -e "${C_DIM}   Token dibutuhkan agar script bisa push ke GitHub.${C_RESET}"
     echo ""
-    printf "${C_BOLD}Paste token GitHub kamu ▸ ${C_RESET}"
+    echo -e "${C_BOLD}Cara dapat token (sekali aja):${C_RESET}"
+    echo -e "  ${C_CYAN}1.${C_RESET} Buka  → ${C_BLUE}https://github.com/settings/tokens${C_RESET}"
+    echo -e "  ${C_CYAN}2.${C_RESET} Klik  → ${C_BOLD}Generate new token (classic)${C_RESET}"
+    echo -e "  ${C_CYAN}3.${C_RESET} Centang scope ${C_BOLD}repo${C_RESET} (full control) → Generate"
+    echo -e "  ${C_CYAN}4.${C_RESET} Copy token-nya → paste di bawah"
+    echo ""
+    echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}"
+    printf "${C_BOLD}  Paste token kamu ▸ ${C_RESET}"
 
     # Sembunyikan input (seperti password)
     local input_tok=""
@@ -94,15 +99,17 @@ setup_token() {
 
     if [ -z "$input_tok" ] || echo "$input_tok" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
       echo ""
-      echo -e "${C_RED}❌ Token tidak valid / kosong. Script berhenti.${C_RESET}"
+      echo -e "  ${C_RED}❌ Token tidak valid / kosong. Script berhenti.${C_RESET}"
+      echo -e "  ${C_DIM}   Jalankan lagi: bash push.sh${C_RESET}"
       exit 1
     fi
 
     # Simpan ke .token.secret
     printf '%s' "$input_tok" > .token.secret
     echo ""
-    echo -e "  ${C_GREEN}✅ Token disimpan ke .token.secret${C_RESET}"
-    echo -e "  ${C_DIM}   (File ini gitignored — tidak akan ke-upload ke GitHub)${C_RESET}"
+    echo -e "${C_DIM}─────────────────────────────────────────────────${C_RESET}"
+    echo -e "  ${C_GREEN}✅ Token berhasil disimpan ke .token.secret${C_RESET}"
+    echo -e "  ${C_DIM}   File ini gitignored — aman, tidak ke-upload ke GitHub${C_RESET}"
     echo ""
     sleep 1
     tok="$input_tok"
