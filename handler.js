@@ -38,7 +38,7 @@ export async function handler(chatUpdate) {
                 
                 if(await nsfwchecker(m, conn)) return
                 
-                if(global.db.data.chats[m.chat]?.isBanned && !isOwner) return
+                if(global.db.data.chats[m.chat]?.isBanned && !isOwner) { _blocked = true; return; }
                 if (m.isBaileys) return;
                 m.exp += Math.ceil(Math.random() * 10);
 
