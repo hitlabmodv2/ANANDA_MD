@@ -29,7 +29,7 @@
 # ─────────────────────────────────────────────────────────────
 
 USER="hitlabmodv2"
-REPO="ANANDA_MD"
+REPO="HONOLULU_AI"
 # DEFAULT_BRANCH di-auto-detect realtime dari GitHub (lihat detect_default_branch).
 # Nilai di sini cuma fallback kalau koneksi ke GitHub bermasalah.
 DEFAULT_BRANCH="HONOLULU_AI_V1_2_TSUNDERE"
@@ -530,10 +530,7 @@ action_rename_repo() {
   fi
 
   rm -f /tmp/_gh_rename.json
-  echo ""
-  echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
-  printf "${C_BOLD}▸ ${C_RESET}"
-  read -r
+  prompt_back_or_exit
 }
 
 # ===== Action: ganti default branch =====
@@ -551,10 +548,7 @@ action_switch_default() {
   local total=${#branches[@]}
   if [ "$total" -eq 0 ]; then
     echo -e "${C_YELLOW}ℹ️  Tidak ada branch lain yang tersedia.${C_RESET}"
-    echo ""
-    echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
-    printf "${C_BOLD}▸ ${C_RESET}"
-    read -r
+    prompt_back_or_exit
     return
   fi
 
@@ -624,10 +618,7 @@ action_switch_default() {
   fi
 
   rm -f /tmp/_gh_switch.json
-  echo ""
-  echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
-  printf "${C_BOLD}▸ ${C_RESET}"
-  read -r
+  prompt_back_or_exit
 }
 
 # ===== Action: buat branch baru =====
@@ -693,10 +684,7 @@ action_create_branch() {
   # Balik ke default
   git checkout -q "$DEFAULT_BRANCH" 2>/dev/null || true
 
-  echo ""
-  echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
-  printf "${C_BOLD}▸ ${C_RESET}"
-  read -r
+  prompt_back_or_exit
 }
 
 # ===== Action: hapus branch =====
@@ -714,10 +702,7 @@ action_delete_branch() {
   if [ "$total" -eq 0 ]; then
     echo -e "${C_YELLOW}ℹ️  Tidak ada branch yang bisa dihapus${C_RESET}"
     echo -e "${C_DIM}   (cuma branch default '${DEFAULT_BRANCH}' yang ada)${C_RESET}"
-    echo ""
-    echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
-    printf "${C_BOLD}▸ ${C_RESET}"
-    read -r
+    prompt_back_or_exit
     return
   fi
 
@@ -852,10 +837,7 @@ action_delete_branch() {
   echo -e "  ${C_GREEN}✅ Sukses : ${ok}${C_RESET}"
   [ "$fail" -gt 0 ] && echo -e "  ${C_RED}❌ Gagal  : ${fail}${C_RESET}"
 
-  echo ""
-  echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
-  printf "${C_BOLD}▸ ${C_RESET}"
-  read -r
+  prompt_back_or_exit
 }
 
 # ===== Menu pemilih branch (sub-menu dari opsi 1) =====
@@ -1093,6 +1075,22 @@ run_upload() {
     echo -e "  ${C_GREEN}✅ Sukses : ${ok}${C_RESET}"
     [ "$fail" -gt 0 ] && echo -e "  ${C_RED}❌ Gagal  : ${fail}${C_RESET}"
   fi
+
+  prompt_back_or_exit
+}
+
+# ===== Helper: prompt tunggal setelah setiap action =====
+prompt_back_or_exit() {
+  echo ""
+  echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
+  echo -e "  ${C_RED}0${C_RESET} ${C_DIM}keluar${C_RESET}"
+  printf "${C_BOLD}▸ ${C_RESET}"
+  local _ans
+  read -r _ans
+  _ans="${_ans:-1}"
+  case "$_ans" in
+    0|q|Q|exit) goodbye_prompt ;;
+  esac
 }
 
 # ===== Loop menu utama =====
@@ -1100,18 +1098,6 @@ main_loop() {
   while true; do
     SELECTED_BRANCHES=()
     show_main_menu
-
-    echo ""
-    echo -e "  ${C_GREEN}1${C_RESET} ${C_DIM}kembali ke menu${C_RESET}"
-    echo -e "  ${C_RED}0${C_RESET} ${C_DIM}atau q untuk keluar${C_RESET}"
-    printf "${C_BOLD}▸ ${C_RESET}"
-    read -r next
-    next="${next:-1}"
-    case "$next" in
-      q|Q|exit|0)
-        goodbye_prompt
-        ;;
-    esac
   done
 }
 
