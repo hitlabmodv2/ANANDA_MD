@@ -5,6 +5,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
         const type = (args[0] || '').toLowerCase();
 
         switch (type) {
+                case 'all':
                 case 'public':
                         settings.public = true;
                         settings.gconly = false;
@@ -65,7 +66,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
                         m.reply(
                                 `*Mode Bot Saat Ini:* ${modeLabel}\n\n` +
                                 `*Pilihan mode:*\n` +
-                                `- ${usedPrefix}mode public  → semua orang, private + grup\n` +
+                                `- ${usedPrefix}mode all     → semua orang, private + grup\n` +
                                 `- ${usedPrefix}mode self    → owner only, private + grup\n` +
                                 `- ${usedPrefix}mode gc      → semua orang, grup saja\n` +
                                 `- ${usedPrefix}mode pc      → semua orang, private saja\n` +
@@ -75,7 +76,7 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
         }
 };
 
-handler.help = ['mode <public|self|gc|pc|status>'];
+handler.help = ['mode <all|self|gc|pc|status>'];
 handler.tags = ['main'];
 handler.command = /^mode$/i;
 
