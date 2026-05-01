@@ -15,9 +15,14 @@ let handler = async (m, { conn, usedPrefix, command, args, isOwner }) => {
         };
 
         const buildStatusPanel = (activeMode) => {
-                const lines = Object.entries(modeInfo).map(([key, info]) => {
+                const entries = Object.entries(modeInfo);
+                const active = entries.filter(([key]) => key === activeMode);
+                const inactive = entries.filter(([key]) => key !== activeMode);
+                const ordered = [...active, ...inactive];
+
+                const lines = ordered.map(([key, info]) => {
                         const isActive = key === activeMode;
-                        return `${isActive ? '✅' : '☑️'} ${info.label} ${isActive ? '*(aktif)*' : ''}\n   └ ${info.desc}`;
+                        return `${isActive ? '✅' : '❌'} ${info.label}${isActive ? ' *(aktif)*' : ' *(non-aktif)*'}\n   └ ${info.desc}`;
                 });
                 return (
                         `╔══ 𝙼𝙾𝙳𝙴 𝙱𝙾𝚃 ══╗\n\n` +
