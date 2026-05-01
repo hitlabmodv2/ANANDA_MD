@@ -73,14 +73,34 @@ open_url() {
 # ===== Layar generate token otomatis =====
 # Buka halaman GitHub pre-filled → scope repo sudah tercentang otomatis.
 screen_generate_token() {
-  local TOKEN_URL="https://github.com/settings/tokens/new?description=BangWilyPushScript&scopes=repo"
+  # Semua scope dari GitHub PAT classic — tercentang otomatis saat halaman terbuka
+  local _ALL_SCOPES="repo,repo:status,repo_deployment,public_repo,repo:invite,security_events"
+  _ALL_SCOPES="${_ALL_SCOPES},workflow"
+  _ALL_SCOPES="${_ALL_SCOPES},write:packages,read:packages,delete:packages"
+  _ALL_SCOPES="${_ALL_SCOPES},admin:org,write:org,read:org,manage_runners:org"
+  _ALL_SCOPES="${_ALL_SCOPES},admin:public_key,write:public_key,read:public_key"
+  _ALL_SCOPES="${_ALL_SCOPES},admin:repo_hook,write:repo_hook,read:repo_hook"
+  _ALL_SCOPES="${_ALL_SCOPES},admin:org_hook"
+  _ALL_SCOPES="${_ALL_SCOPES},gist,notifications"
+  _ALL_SCOPES="${_ALL_SCOPES},user,read:user,user:email,user:follow"
+  _ALL_SCOPES="${_ALL_SCOPES},delete_repo"
+  _ALL_SCOPES="${_ALL_SCOPES},write:discussion,read:discussion"
+  _ALL_SCOPES="${_ALL_SCOPES},admin:enterprise,manage_runners:enterprise,manage_billing:enterprise,read:enterprise,scim:enterprise"
+  _ALL_SCOPES="${_ALL_SCOPES},audit_log,read:audit_log"
+  _ALL_SCOPES="${_ALL_SCOPES},codespace,codespace:secrets"
+  _ALL_SCOPES="${_ALL_SCOPES},copilot,manage_billing:copilot"
+  _ALL_SCOPES="${_ALL_SCOPES},write:network_configurations,read:network_configurations"
+  _ALL_SCOPES="${_ALL_SCOPES},project,read:project"
+  _ALL_SCOPES="${_ALL_SCOPES},admin:gpg_key,write:gpg_key,read:gpg_key"
+  _ALL_SCOPES="${_ALL_SCOPES},admin:ssh_signing_key,write:ssh_signing_key,read:ssh_signing_key"
+  local TOKEN_URL="https://github.com/settings/tokens/new?description=BangWilyPushScript&scopes=${_ALL_SCOPES}"
 
   clear 2>/dev/null || true
   echo -e "${C_BOLD}╔══════════════════════════════════════════════════╗${C_RESET}" >&2
   echo -e "${C_BOLD}║     🔑  GENERATE TOKEN OTOMATIS — BANG WILY      ║${C_RESET}" >&2
   echo -e "${C_BOLD}╚══════════════════════════════════════════════════╝${C_RESET}" >&2
   echo "" >&2
-  echo -e "${C_DIM}  Membuka halaman GitHub... (scope ${C_BOLD}repo${C_RESET}${C_DIM} sudah tercentang)${C_RESET}" >&2
+  echo -e "${C_DIM}  Membuka halaman GitHub... (${C_BOLD}semua scope${C_RESET}${C_DIM} sudah tercentang, nama token sudah terisi)${C_RESET}" >&2
   echo "" >&2
 
   if open_url "$TOKEN_URL"; then
