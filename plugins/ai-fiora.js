@@ -67,24 +67,7 @@ const HONOLULU_STICKERS = [
   { n: 15, name: "mikir + sedikit kesel",      url: "https://cdn.ornzora.eu.cc/7fce094a-28c8-443f-8602-9be9518d5369-FIORA.webp" },
   { n: 16, name: "malu berat (sensual)",       url: "https://cdn.ornzora.eu.cc/7c896ced-9e8f-4b06-9dc6-228c6b94208f-FIORA.webp" },
   { n: 17, name: "capek total / drop",         url: "https://cdn.ornzora.eu.cc/390fadb4-0548-4978-8dc3-f4ee398a31e9-FIORA.webp" },
-  { n: 18, name: "panik / kewalahan",          url: "https://cdn.ornzora.eu.cc/b92ddde7-eccd-43c7-9536-295f528cd741-FIORA.webp" },
-  // ── HONOLULU stickers (set baru) ──
-  { n: 19, name: "malu nutup muka (HONOLULU)",         url: "https://cdn.ornzora.eu.cc/a44ce53e-6b1e-4a7f-b5cd-e60ee2d285bf-HONOLULU.webp" },
-  { n: 20, name: "senyum kecil / lembut (HONOLULU)",   url: "https://cdn.ornzora.eu.cc/6853b306-6f51-47f4-8b7a-694a6c4ed618-HONOLULU.webp" },
-  { n: 21, name: "datar / blank stare (HONOLULU)",     url: "https://cdn.ornzora.eu.cc/ba453a09-aabd-4483-9ca1-0ef1b66f34c1-HONOLULU.webp" },
-  { n: 22, name: "ceria ringan (HONOLULU)",             url: "https://cdn.ornzora.eu.cc/fbcea89f-580c-4f52-970f-2e1fa44abdce-HONOLULU.webp" },
-  { n: 23, name: "smug / puas dikit (HONOLULU)",       url: "https://cdn.ornzora.eu.cc/31f63a4b-95a8-440a-9d77-9d634ef2153a-HONOLULU.webp" },
-  { n: 24, name: "mikir / skeptis (HONOLULU)",          url: "https://cdn.ornzora.eu.cc/a4bbcdf7-0c78-4d43-93e2-f0ebad7d1bf6-HONOLULU.webp" },
-  { n: 25, name: "kaget positif (HONOLULU)",            url: "https://cdn.ornzora.eu.cc/b371232a-5655-4341-985f-90aa4efcc9c4-HONOLULU.webp" },
-  { n: 26, name: "malu + gugup (HONOLULU)",             url: "https://cdn.ornzora.eu.cc/2203539e-dfc0-4bd7-b4bf-e0ad72385c02-HONOLULU.webp" },
-  { n: 27, name: "jahil / ngejek (HONOLULU)",           url: "https://cdn.ornzora.eu.cc/3d3b9600-910a-452e-b567-922c193b9bbb-HONOLULU.webp" },
-  { n: 28, name: "malu berat / flustered (HONOLULU)",  url: "https://cdn.ornzora.eu.cc/98de1e26-b28f-42a7-a6f1-c769ddf1e6eb-HONOLULU.webp" },
-  { n: 29, name: "ngamuk lucu (HONOLULU)",              url: "https://cdn.ornzora.eu.cc/dd1de830-8664-490d-96c4-cc199bddb284-HONOLULU.webp" },
-  { n: 30, name: "kesel lucu (HONOLULU)",               url: "https://cdn.ornzora.eu.cc/41f054d0-55e9-4d1a-abb7-6a49ac74769b-HONOLULU.webp" },
-  { n: 31, name: "datar / males respon (HONOLULU)",    url: "https://cdn.ornzora.eu.cc/0e5ac3ba-8326-46ab-947c-fb03374207f6-HONOLULU.webp" },
-  { n: 32, name: "chaotic / zamn (HONOLULU)",           url: "https://cdn.ornzora.eu.cc/c3de99b6-bf96-46f6-bef7-d929c6399175-HONOLULU.webp" },
-  { n: 33, name: "mikir + sedikit kesel (HONOLULU)",   url: "https://cdn.ornzora.eu.cc/85d768a4-fedb-4f1f-8e21-86254fcd6049-HONOLULU.webp" },
-  { n: 34, name: "capek total / drop (HONOLULU)",      url: "https://cdn.ornzora.eu.cc/4f528082-cccc-46ad-839c-d31dc19888a7-HONOLULU.webp" }
+  { n: 18, name: "panik / kewalahan",          url: "https://cdn.ornzora.eu.cc/b92ddde7-eccd-43c7-9536-295f528cd741-FIORA.webp" }
 ];
 
 function findStickerMeta(url) {
