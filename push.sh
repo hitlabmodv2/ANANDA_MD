@@ -56,14 +56,31 @@ fi
 CUSTOM_MSG="${1:-}"
 
 # ===== Baca token =====
-if [ ! -f .token ]; then
-  echo -e "${C_RED}❌ File .token tidak ada!${C_RESET}"
-  echo "   Bikin dulu : ${C_DIM}echo 'ghp_xxxxxxxx' > .token${C_RESET}"
-  exit 1
+# Urutan prioritas:
+#   1. .token.secret  → file token asli (GITIGNORED, aman)
+#   2. .token         → hanya berisi contoh/tutorial (aman di-upload ke GitHub)
+TOKEN=""
+if [ -f .token.secret ]; then
+  TOKEN=$(tr -d '\n\r ' < .token.secret)
 fi
-TOKEN=$(tr -d '\n\r ' < .token)
+
+# Kalau .token.secret kosong / tidak ada, coba baca .token
+# tapi pastikan isinya bukan placeholder tutorial
 if [ -z "$TOKEN" ]; then
-  echo -e "${C_RED}❌ File .token kosong!${C_RESET}"
+  if [ ! -f .token ]; then
+    echo -e "${C_RED}❌ File .token.secret tidak ada!${C_RESET}"
+    echo "   Bikin dulu : ${C_DIM}echo 'ghp_xxxxxxxx' > .token.secret${C_RESET}"
+    echo "   ${C_DIM}(.token hanya untuk contoh/tutorial, token asli di .token.secret)${C_RESET}"
+    exit 1
+  fi
+  TOKEN=$(tr -d '\n\r ' < .token)
+fi
+
+# Tolak kalau isinya masih placeholder / tutorial
+if [ -z "$TOKEN" ] || echo "$TOKEN" | grep -qE '^(#|ghp_x|TOKEN_KAMU|ISI_TOKEN|CONTOH|<|your)'; then
+  echo -e "${C_RED}❌ Token belum diisi!${C_RESET}"
+  echo "   Simpan token asli kamu di: ${C_DIM}.token.secret${C_RESET}"
+  echo "   Contoh: ${C_DIM}echo 'ghp_xxxxxxxx' > .token.secret${C_RESET}"
   exit 1
 fi
 
@@ -340,11 +357,10 @@ prepare_stage() {
     echo -e "  ${C_DIM}   (file di disk tetap ada, cuma dilepas dari tracking git)${C_RESET}"
   fi
 
-  # ⚠️  KEAMANAN: Auto-untrack .token agar token GitHub tidak pernah ke-commit.
-  # File .token HARUS SELALU di-ignore — ini proteksi berlapis.
-  if git ls-files --error-unmatch .token >/dev/null 2>&1; then
-    echo -e "  ${C_YELLOW}🔐 Untrack .token dari git (file tetap aman di disk)...${C_RESET}"
-    git rm --cached -q .token 2>>"$err_log" || true
+  # ⚠️  KEAMANAN: Auto-untrack .token.secret agar token asli tidak pernah ke-commit.
+  if git ls-files --error-unmatch .token.secret >/dev/null 2>&1; then
+    echo -e "  ${C_YELLOW}🔐 Untrack .token.secret dari git (file tetap aman di disk)...${C_RESET}"
+    git rm --cached -q .token.secret 2>>"$err_log" || true
   fi
 
   # Stage SEMUA perubahan (baru, modified, deleted, rename).
@@ -355,11 +371,11 @@ prepare_stage() {
     return 1
   fi
 
-  # Pastikan .token TIDAK pernah masuk stage — blokir paksa setelah git add -A.
-  git rm --cached -q .token 2>/dev/null || true
+  # Pastikan .token.secret TIDAK pernah masuk stage — blokir paksa setelah git add -A.
+  git rm --cached -q .token.secret 2>/dev/null || true
 
   # Force-add file penting yang biasanya di-ignore.
-  # CATATAN: node_modules & .token SENGAJA TIDAK di-force-add.
+  # CATATAN: node_modules & .token.secret SENGAJA TIDAK di-force-add.
   for forced in package-lock.json .env \
                 sessions/hisoka/creds.json \
                 sessions/hisoka/contacts.json \

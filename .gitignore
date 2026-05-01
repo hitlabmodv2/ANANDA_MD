@@ -32,4 +32,5 @@ sessions/**
 jadibot/**
 !jadibot/
 !jadibot/.gitkeep
-.token
+# .token.secret = file token ASLI — JANGAN pernah di-commit!
+.token.secret
