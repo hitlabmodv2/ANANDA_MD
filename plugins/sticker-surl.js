@@ -6,12 +6,26 @@ let handler = async (m, { conn, text }) => {
         const urlRegex = /https?:\/\/[^\s]+/i;
         const urlMatch = text && text.match(urlRegex);
 
+        // Capture m.quoted SEKALI saja — ini getter, setiap akses bisa beda nilainya
+        const q = m.quoted;
+
         // Mode 1: reply ke sticker → upload ke CDN → balas URL webp-nya
-        if (m.quoted && m.quoted.mtype === 'stickerMessage') {
+        if (q && q.mtype === 'stickerMessage') {
                 await m.reply('⏳ Mengambil URL stiker...');
 
-                const media = await conn.downloadM(m.quoted.msg || m.quoted, 'sticker');
-                if (!media || media.length === 0) return m.reply('❌ Gagal membaca data stiker.');
+                let media;
+                try {
+                        if (typeof q.download === 'function') {
+                                media = await q.download();
+                        } else {
+                                const stickerData = q.msg || q;
+                                media = await conn.downloadM(stickerData, 'sticker');
+                        }
+                } catch (e) {
+                        return m.reply(`❌ Gagal download stiker.\nError: ${e.message}`);
+                }
+
+                if (!media || media.length === 0) return m.reply('❌ Gagal membaca data stiker, coba lagi.');
 
                 const type = await fileTypeFromBuffer(media);
                 const ext = type?.ext || 'webp';
@@ -62,13 +76,9 @@ let handler = async (m, { conn, text }) => {
                         return m.reply(`❌ File bukan gambar/webp.\nTerdeteksi: ${mime || 'unknown'}`);
                 }
 
-                const exif = {
-                        packName: global.stickpack || '',
-                        packPublish: global.stickauth || ''
-                };
+                const exif = { packName: global.stickpack || '', packPublish: global.stickauth || '' };
                 await conn.sendSticker(m.chat, buf, m, exif);
 
-        // Tidak ada stiker di-reply dan tidak ada URL
         } else {
                 m.reply(
                         '📎 *Cara pakai .surl:*\n\n' +
