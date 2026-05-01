@@ -370,7 +370,7 @@ export async function deleteUpdate(message) {
                 let msg = this.serializeM(this.loadMessage(id));
                 if (!msg) return;
                 let chat = global.db.data.chats[msg.chat];
-                if (!chat.delete) return;
+                if (!chat || !chat.delete) return;
                 await this.reply(
                         msg.chat,
                         `
