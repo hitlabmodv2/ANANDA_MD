@@ -1,20 +1,41 @@
 import axios from 'axios';
+import FormData from 'form-data';
 import { fileTypeFromBuffer } from 'file-type';
 
 let handler = async (m, { conn, text }) => {
         const urlRegex = /https?:\/\/[^\s]+/i;
         const urlMatch = text && text.match(urlRegex);
 
-        // Mode 1: reply ke sticker yang sudah ada → kirim ulang stiker itu
+        // Mode 1: reply ke sticker → upload ke CDN → balas URL webp-nya
         if (m.quoted && m.quoted.mtype === 'stickerMessage') {
-                const media = await m.quoted.download();
-                const exif = {
-                        packName: global.stickpack || '',
-                        packPublish: global.stickauth || ''
-                };
-                await conn.sendSticker(m.chat, media, m, exif);
+                await m.reply('⏳ Mengambil URL stiker...');
 
-        // Mode 2: .surl <url> → download URL dan kirim sebagai stiker
+                const media = await m.quoted.download();
+                const type = await fileTypeFromBuffer(media);
+                const ext = type?.ext || 'webp';
+                const filename = `SURL_${Date.now()}.${ext}`;
+
+                const form = new FormData();
+                form.append('file', media, { filename });
+
+                let uploadRes;
+                try {
+                        const res = await axios.post('https://cdn.ornzora.eu.cc/upload', form, {
+                                headers: { ...form.getHeaders() },
+                                timeout: 20000
+                        });
+                        uploadRes = res.data;
+                } catch (e) {
+                        return m.reply(`❌ Gagal upload ke CDN.\nError: ${e.message}`);
+                }
+
+                if (!uploadRes?.success || !uploadRes?.url) {
+                        return m.reply('❌ Upload gagal, CDN tidak mengembalikan URL.');
+                }
+
+                await m.reply(`🔗 *URL Stiker:*\n${uploadRes.url}`);
+
+        // Mode 2: .surl <url> → download URL → kirim sebagai stiker
         } else if (urlMatch) {
                 const url = urlMatch[0];
                 let buf;
@@ -23,9 +44,7 @@ let handler = async (m, { conn, text }) => {
                         const res = await axios.get(url, {
                                 responseType: 'arraybuffer',
                                 timeout: 15000,
-                                headers: {
-                                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                                }
+                                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
                         });
                         buf = Buffer.from(res.data);
                 } catch (e) {
@@ -37,7 +56,6 @@ let handler = async (m, { conn, text }) => {
 
                 const type = await fileTypeFromBuffer(buf);
                 const mime = type?.mime || '';
-
                 if (!/image|webp/.test(mime)) {
                         return m.reply(`❌ File bukan gambar/webp.\nTerdeteksi: ${mime || 'unknown'}`);
                 }
@@ -52,8 +70,8 @@ let handler = async (m, { conn, text }) => {
         } else {
                 m.reply(
                         '📎 *Cara pakai .surl:*\n\n' +
-                        '1️⃣ Reply ke sticker → bot kirim ulang stiker itu\n' +
-                        '2️⃣ .surl <url> → download URL dan kirim sebagai stiker\n\n' +
+                        '1️⃣ Reply ke stiker → bot balas URL webp-nya\n' +
+                        '2️⃣ .surl <url> → download URL lalu kirim sebagai stiker\n\n' +
                         'Contoh:\n' +
                         '.surl https://cdn.ornzora.eu.cc/502784e6-108d-49d7-a981-04083d14ad9a-FIORA.webp'
                 );
