@@ -710,7 +710,7 @@ async function fioraRichResponse(rich_response, conn, m, { startThinking }) {
 }
 
 function generateFioraID() {
-        return 'HONOLULU' + generateMessageIDV2().slice(5);
+        return generateMessageIDV2();
         }
 
 async function getWaveForm(buffer, samples = 100) {
