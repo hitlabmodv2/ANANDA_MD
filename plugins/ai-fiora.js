@@ -19,6 +19,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PERSONA_PATH = join(__dirname, '../lib/Honolulu-PERSONA.txt');
 
+// ── PERSONA CACHE — dibaca sekali saat load, bukan tiap request ──
+let _PERSONA_CACHE = null
+function getPersona() {
+        if (!_PERSONA_CACHE) {
+                _PERSONA_CACHE = fs.readFileSync(PERSONA_PATH, 'utf8')
+        }
+        return _PERSONA_CACHE
+}
+function invalidatePersonaCache() {
+        _PERSONA_CACHE = null
+}
+
 function formatStageDirections(t) {
   if (typeof t !== 'string' || !t) return t
   let out = t
@@ -140,6 +152,7 @@ let handler = async (m, { conn, text, usedPrefix, command, groupMetadata, isOwne
                 if(!isOwner) return
                 if(!m.quoted?.text) return m.reply("Reply teks prompt!");
                 await fs.writeFileSync(PERSONA_PATH, m.quoted.text)
+                invalidatePersonaCache()
                 return m.reply("Success Update Persona.") 
                 }
         if (command == "fioraresetdb") {
@@ -316,8 +329,8 @@ async function fiora(m, input, { isToolCall = false, groupMetadata } = {}) {
         }
         const _typingDelay = async (text = '') => {
                 const len = typeof text === 'string' ? text.length : 0
-                // 25ms per karakter — min 600ms, max 5500ms
-                const delay = Math.min(Math.max(len * 25, 600), 5500)
+                // 15ms per karakter — min 400ms, max 2000ms
+                const delay = Math.min(Math.max(len * 15, 400), 2000)
                 try { await conn.sendPresenceUpdate('composing', m.chat) } catch (_) {}
                 await new Promise(r => setTimeout(r, delay))
         }
@@ -1689,7 +1702,7 @@ mime: ${qFile.mimetype}`
 function prompt(user, m) {
         const time = getWIBDateTime()
         //const FACES = fs.readFileSync('./lib/F-59.txt').toString()
-        const PERSONA = fs.readFileSync(PERSONA_PATH, 'utf8')
+        const PERSONA = getPersona()
         return `[SYSTEM PROMPT]\n
 ${PERSONA}
 
