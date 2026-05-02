@@ -296,12 +296,6 @@ handler.before = async function(m, { conn, text, usedPrefix, groupMetadata, isOw
                 }
         }
 
-handler.help = ['fiora','ai','honolulustic','honoai'];
-handler.tags = ['ai'];
-handler.command = /^(fiora.*|honolulustic|honolulusticreset|honolulustats|honolulustatsreset|ai|honoai)$/i;
-
-export default handler;
-
 async function fiora(m, input, { isToolCall = false, groupMetadata } = {}) {
         if (!global.db.data.msgs[m.chat]) global.db.data.msgs[m.chat] = {};
         if (!global.db.data.msgs[m.chat].fioradb) global.db.data.msgs[m.chat].fioradb = [];
@@ -2292,3 +2286,10 @@ Output rapi dan optimal untuk WhatsApp
 
 --------------------------------------------------`
 }
+
+handler.help = ['fiora', 'ai', 'honolulustic', 'honoai'];
+handler.tags = ['ai'];
+handler.command = /^(fiora.*|honolulustic|honolulusticreset|honolulustats|honolulustatsreset|ai|honoai)$/i;
+handler.limit = true;
+
+export default handler;
