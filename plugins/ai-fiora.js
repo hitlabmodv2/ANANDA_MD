@@ -300,7 +300,29 @@ async function fiora(m, input, { isToolCall = false, groupMetadata } = {}) {
         if (!global.db.data.msgs[m.chat]) global.db.data.msgs[m.chat] = {};
         if (!global.db.data.msgs[m.chat].fioradb) global.db.data.msgs[m.chat].fioradb = [];
 
-        await m.react("\uD83C\uDF42") 
+        await m.react("\uD83C\uDF42")
+
+        // ── AUTO TYPING SYSTEM ──
+        let _typingInterval = null
+        const _startTyping = async () => {
+                try { await conn.sendPresenceUpdate('composing', m.chat) } catch (_) {}
+                _typingInterval = setInterval(async () => {
+                        try { await conn.sendPresenceUpdate('composing', m.chat) } catch (_) {}
+                }, 4000)
+        }
+        const _stopTyping = async () => {
+                if (_typingInterval) { clearInterval(_typingInterval); _typingInterval = null }
+                try { await conn.sendPresenceUpdate('paused', m.chat) } catch (_) {}
+        }
+        const _typingDelay = async (text = '') => {
+                const len = typeof text === 'string' ? text.length : 0
+                // 25ms per karakter — min 600ms, max 5500ms
+                const delay = Math.min(Math.max(len * 25, 600), 5500)
+                try { await conn.sendPresenceUpdate('composing', m.chat) } catch (_) {}
+                await new Promise(r => setTimeout(r, delay))
+        }
+        await _startTyping()
+        // ── END AUTO TYPING ──
 
         const isDebug = global.db.data.msgs[m.sender]?.fioradebug
         let debugText = ""
@@ -470,6 +492,11 @@ if (isDebug) {
     start = Date.now()
   }
 
+  // ── TYPING DELAY: stop refresh interval, lalu simulasi ngetik berdasarkan panjang respons ──
+  clearInterval(_typingInterval); _typingInterval = null
+  await _typingDelay(res)
+  // ────────────────────────────────────────────────────────────────────────────────────────────
+
   const parsed = parseAIReq(res)
   let result_tool = null
 
@@ -519,6 +546,7 @@ if (isDebug) {
         if (!hasNoResponse) {
           await m.react("");
         }
+        await _stopTyping()
 
   if (isDebug) {
     debugText += ` ${(Date.now() - start)}ms\n[TOTAL] ${total}ms`
@@ -531,6 +559,7 @@ if (isDebug) {
   }
 
 } catch (err) {
+  await _stopTyping()
   if(err.message.includes('empty response') || err.message.includes('TOO_MANY_ATTEMPTS_TRY_LATER')) {
         await m.reply("aku tidak mengerti maksudmu, bisa kau ulangi lagi?")
   } else await m.reply('Terjadi Kesalahan\n\n' + err.stack)
