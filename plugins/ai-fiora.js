@@ -418,7 +418,8 @@ if (isDebug) {
   const ai = new Gemini()
 
   const res = await ai.chat({
-    model: 'gemini-2.5-flash',
+    //model: 'gemini-2.5-flash', 
+    //model: 'gemini-pro-latest', 
     maxOutputTokens: 16000,
     contents: [
       {
@@ -501,17 +502,10 @@ if (isDebug) {
   }
 
 } catch (err) {
-  const msg = err.message || ''
-  if (msg.includes('timeout') || msg.includes('ECONNABORTED') || msg.includes('ETIMEDOUT')) {
-    await m.reply("koneksi ke AI timeout, coba lagi ya~")
-  } else if (msg.includes('empty response') || msg.includes('TOO_MANY_ATTEMPTS_TRY_LATER')) {
-    await m.reply("aku tidak mengerti maksudmu, bisa kau ulangi lagi?")
-  } else if (msg.includes('429') || msg.includes('rate limit') || msg.includes('quota')) {
-    await m.reply("AI lagi overload, tunggu sebentar ya~")
-  } else {
-    await m.reply('Terjadi Kesalahan\n\n' + err.stack)
-  }
-  console.error('[Fiora Error]', err.message)
+  if(err.message.includes('empty response') || err.message.includes('TOO_MANY_ATTEMPTS_TRY_LATER')) {
+        await m.reply("aku tidak mengerti maksudmu, bisa kau ulangi lagi?")
+  } else await m.reply('Terjadi Kesalahan\n\n' + err.stack)
+  console.error(err)
 }
         }
 
