@@ -89,7 +89,20 @@ const HONOLULU_STICKERS = [
   { n: 31, name: "datar / males respon (HONOLULU)",    url: "https://cdn.ornzora.eu.cc/0e5ac3ba-8326-46ab-947c-fb03374207f6-HONOLULU.webp" },
   { n: 32, name: "chaotic / zamn (HONOLULU)",           url: "https://cdn.ornzora.eu.cc/c3de99b6-bf96-46f6-bef7-d929c6399175-HONOLULU.webp" },
   { n: 33, name: "mikir + sedikit kesel (HONOLULU)",   url: "https://cdn.ornzora.eu.cc/85d768a4-fedb-4f1f-8e21-86254fcd6049-HONOLULU.webp" },
-  { n: 34, name: "capek total / drop (HONOLULU)",      url: "https://cdn.ornzora.eu.cc/4f528082-cccc-46ad-839c-d31dc19888a7-HONOLULU.webp" }
+  { n: 34, name: "capek total / drop (HONOLULU)",              url: "https://cdn.ornzora.eu.cc/4f528082-cccc-46ad-839c-d31dc19888a7-HONOLULU.webp" },
+  // ── HONOLULU SET C (ekspresi baru) ──
+  { n: 49, name: "tsundere pose klasik (HONOLULU)",           url: "https://cdn.ornzora.eu.cc/1afd0a2a-ea2d-4dad-979b-4b93d91bdf03-HONOLULU.webp" },
+  { n: 50, name: "tersipu malu dalam (HONOLULU)",             url: "https://cdn.ornzora.eu.cc/a74f6af9-1c2c-44d5-b35e-0330cfc881db-HONOLULU.webp" },
+  { n: 51, name: "semangat / genki mode (HONOLULU)",          url: "https://cdn.ornzora.eu.cc/449471bc-ace4-4940-b771-ff0870fe440f-HONOLULU.webp" },
+  { n: 52, name: "galak full mode (HONOLULU)",                url: "https://cdn.ornzora.eu.cc/68665968-e561-4d83-85b7-f109cdc43a4a-HONOLULU.webp" },
+  { n: 53, name: "menahan nangis (HONOLULU)",                 url: "https://cdn.ornzora.eu.cc/50ddaa82-1c24-4566-9a1c-0518c2336120-HONOLULU.webp" },
+  { n: 54, name: "stoic / tenang total (HONOLULU)",           url: "https://cdn.ornzora.eu.cc/8ef9c4b7-0c0b-4ffd-a4f4-fe646450c9d9-HONOLULU.webp" },
+  { n: 55, name: "protective mode (HONOLULU)",                url: "https://cdn.ornzora.eu.cc/b47f0c6d-bcac-4cab-a178-63c944623d0e-HONOLULU.webp" },
+  { n: 56, name: "surprise blush (HONOLULU)",                 url: "https://cdn.ornzora.eu.cc/d5d1fa53-1219-43e2-afc5-68da22a431d1-HONOLULU.webp" },
+  { n: 57, name: "pensive / merenung (HONOLULU)",             url: "https://cdn.ornzora.eu.cc/139eb47a-712a-4095-be7d-ae0f0800f660-HONOLULU.webp" },
+  { n: 58, name: "senyum tulus / rare smile (HONOLULU)",      url: "https://cdn.ornzora.eu.cc/19938391-0a15-4a7c-9f11-46af6822bb00-HONOLULU.webp" },
+  { n: 59, name: "facepalm / hopeless (HONOLULU)",            url: "https://cdn.ornzora.eu.cc/c06ae88e-858b-4a22-af58-52091d095b94-HONOLULU.webp" },
+  { n: 60, name: "ngangguk setuju pelan (HONOLULU)",          url: "https://cdn.ornzora.eu.cc/341224f3-7271-4501-8d29-f921d287b0d2-HONOLULU.webp" }
 ];
 
 function findStickerMeta(url) {
