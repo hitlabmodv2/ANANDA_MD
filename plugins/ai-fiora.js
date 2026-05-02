@@ -67,70 +67,28 @@ const HONOLULU_STICKERS = [
   { n: 15, name: "mikir + sedikit kesel",      url: "https://cdn.ornzora.eu.cc/7fce094a-28c8-443f-8602-9be9518d5369-FIORA.webp" },
   { n: 16, name: "malu berat (sensual)",       url: "https://cdn.ornzora.eu.cc/7c896ced-9e8f-4b06-9dc6-228c6b94208f-FIORA.webp" },
   { n: 17, name: "capek total / drop",         url: "https://cdn.ornzora.eu.cc/390fadb4-0548-4978-8dc3-f4ee398a31e9-FIORA.webp" },
-  { n: 18, name: "panik / kewalahan",          url: "https://cdn.ornzora.eu.cc/b92ddde7-eccd-43c7-9536-295f528cd741-FIORA.webp" }
+  { n: 18, name: "panik / kewalahan",          url: "https://cdn.ornzora.eu.cc/b92ddde7-eccd-43c7-9536-295f528cd741-FIORA.webp" },
+  // ── HONOLULU stickers (set baru) ──
+  { n: 19, name: "malu nutup muka (HONOLULU)",         url: "https://cdn.ornzora.eu.cc/a44ce53e-6b1e-4a7f-b5cd-e60ee2d285bf-HONOLULU.webp" },
+  { n: 20, name: "senyum kecil / lembut (HONOLULU)",   url: "https://cdn.ornzora.eu.cc/6853b306-6f51-47f4-8b7a-694a6c4ed618-HONOLULU.webp" },
+  { n: 21, name: "datar / blank stare (HONOLULU)",     url: "https://cdn.ornzora.eu.cc/ba453a09-aabd-4483-9ca1-0ef1b66f34c1-HONOLULU.webp" },
+  { n: 22, name: "ceria ringan (HONOLULU)",             url: "https://cdn.ornzora.eu.cc/fbcea89f-580c-4f52-970f-2e1fa44abdce-HONOLULU.webp" },
+  { n: 23, name: "smug / puas dikit (HONOLULU)",       url: "https://cdn.ornzora.eu.cc/31f63a4b-95a8-440a-9d77-9d634ef2153a-HONOLULU.webp" },
+  { n: 24, name: "mikir / skeptis (HONOLULU)",          url: "https://cdn.ornzora.eu.cc/a4bbcdf7-0c78-4d43-93e2-f0ebad7d1bf6-HONOLULU.webp" },
+  { n: 25, name: "kaget positif (HONOLULU)",            url: "https://cdn.ornzora.eu.cc/b371232a-5655-4341-985f-90aa4efcc9c4-HONOLULU.webp" },
+  { n: 26, name: "malu + gugup (HONOLULU)",             url: "https://cdn.ornzora.eu.cc/2203539e-dfc0-4bd7-b4bf-e0ad72385c02-HONOLULU.webp" },
+  { n: 27, name: "jahil / ngejek (HONOLULU)",           url: "https://cdn.ornzora.eu.cc/3d3b9600-910a-452e-b567-922c193b9bbb-HONOLULU.webp" },
+  { n: 28, name: "malu berat / flustered (HONOLULU)",  url: "https://cdn.ornzora.eu.cc/98de1e26-b28f-42a7-a6f1-c769ddf1e6eb-HONOLULU.webp" },
+  { n: 29, name: "ngamuk lucu (HONOLULU)",              url: "https://cdn.ornzora.eu.cc/dd1de830-8664-490d-96c4-cc199bddb284-HONOLULU.webp" },
+  { n: 30, name: "kesel lucu (HONOLULU)",               url: "https://cdn.ornzora.eu.cc/41f054d0-55e9-4d1a-abb7-6a49ac74769b-HONOLULU.webp" },
+  { n: 31, name: "datar / males respon (HONOLULU)",    url: "https://cdn.ornzora.eu.cc/0e5ac3ba-8326-46ab-947c-fb03374207f6-HONOLULU.webp" },
+  { n: 32, name: "chaotic / zamn (HONOLULU)",           url: "https://cdn.ornzora.eu.cc/c3de99b6-bf96-46f6-bef7-d929c6399175-HONOLULU.webp" },
+  { n: 33, name: "mikir + sedikit kesel (HONOLULU)",   url: "https://cdn.ornzora.eu.cc/85d768a4-fedb-4f1f-8e21-86254fcd6049-HONOLULU.webp" },
+  { n: 34, name: "capek total / drop (HONOLULU)",      url: "https://cdn.ornzora.eu.cc/4f528082-cccc-46ad-839c-d31dc19888a7-HONOLULU.webp" }
 ];
 
 function findStickerMeta(url) {
   return HONOLULU_STICKERS.find(s => s.url === url) || null;
-}
-
-// Pasangan FIORA ↔ HONOLULU per emosi yang sama (stiker 1–12)
-// Key = URL FIORA, Value = URL HONOLULU penggantinya
-// Stiker 13–18 belum ada padanan HONOLULU → tidak masuk map → dikembalikan as-is
-const STICKER_VARIANT_MAP = {
-  // 1 malu nutup muka
-  "https://cdn.ornzora.eu.cc/502784e6-108d-49d7-a981-04083d14ad9a-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/1afd0a2a-ea2d-4dad-979b-4b93d91bdf03-HONOLULU.webp",
-  // 2 senyum kecil
-  "https://cdn.ornzora.eu.cc/89067324-1a1e-4b51-a379-cdb50e8cd30d-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/a74f6af9-1c2c-44d5-b35e-0330cfc881db-HONOLULU.webp",
-  // 3 datar / blank stare
-  "https://cdn.ornzora.eu.cc/91b84f91-7d92-4850-a743-c0554439861d-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/449471bc-ace4-4940-b771-ff0870fe440f-HONOLULU.webp",
-  // 4 ceria ringan
-  "https://cdn.ornzora.eu.cc/873d7ed5-c36c-43d7-a5ba-0d0acfd73eb8-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/68665968-e561-4d83-85b7-f109cdc43a4a-HONOLULU.webp",
-  // 5 smug / puas
-  "https://cdn.ornzora.eu.cc/e1ab519c-7a03-4246-8cd9-2cfd623247b8-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/50ddaa82-1c24-4566-9a1c-0518c2336120-HONOLULU.webp",
-  // 6 mikir / skeptis
-  "https://cdn.ornzora.eu.cc/5baac1a3-ca2b-4749-a08c-5eabfd418e79-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/8ef9c4b7-0c0b-4ffd-a4f4-fe646450c9d9-HONOLULU.webp",
-  // 7 kaget positif
-  "https://cdn.ornzora.eu.cc/4d58a123-ad35-4bb2-9353-8e3e23c6d0c8-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/b47f0c6d-bcac-4cab-a178-63c944623d0e-HONOLULU.webp",
-  // 8 malu + gugup
-  "https://cdn.ornzora.eu.cc/b7df2441-2731-427d-ba44-e88e1f5275e4-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/d5d1fa53-1219-43e2-afc5-68da22a431d1-HONOLULU.webp",
-  // 9 jahil / ngejek
-  "https://cdn.ornzora.eu.cc/6adbf4a3-07ce-47c8-9dbd-31efce9d0dfe-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/139eb47a-712a-4095-be7d-ae0f0800f660-HONOLULU.webp",
-  // 10 malu berat / flustered
-  "https://cdn.ornzora.eu.cc/9138434c-7338-4f66-9b40-574179b5b072-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/19938391-0a15-4a7c-9f11-46af6822bb00-HONOLULU.webp",
-  // 11 ngamuk lucu
-  "https://cdn.ornzora.eu.cc/6f805809-c16a-4521-bfdf-92ca7d20c6b4-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/c06ae88e-858b-4a22-af58-52091d095b94-HONOLULU.webp",
-  // 12 kesel lucu
-  "https://cdn.ornzora.eu.cc/997a0eb7-090a-404f-9b47-fa84f136705c-FIORA.webp":
-    "https://cdn.ornzora.eu.cc/341224f3-7271-4501-8d29-f921d287b0d2-HONOLULU.webp",
-};
-
-// Balik map: HONOLULU → FIORA (biar dua arah — kalau AI kirim HONOLULU, bisa juga swap ke FIORA)
-const STICKER_VARIANT_REVERSE = Object.fromEntries(
-  Object.entries(STICKER_VARIANT_MAP).map(([f, h]) => [h, f])
-);
-
-/**
- * Secara acak memilih antara versi FIORA atau HONOLULU untuk emosi yang sama.
- * Kalau URL tidak punya pasangan → kembalikan URL asli (tidak berubah).
- * @param {string} url - URL stiker dari AI response
- * @returns {string} URL stiker yang dipilih
- */
-function resolveVariantUrl(url) {
-  const partner = STICKER_VARIANT_MAP[url] || STICKER_VARIANT_REVERSE[url];
-  if (!partner) return url;
-  return Math.random() < 0.5 ? url : partner;
 }
 
 function trackStickerUsage(url, chatJid, senderJid) {
@@ -460,8 +418,7 @@ if (isDebug) {
   const ai = new Gemini()
 
   const res = await ai.chat({
-    //model: 'gemini-2.5-flash', 
-    //model: 'gemini-pro-latest', 
+    model: 'gemini-2.5-flash',
     maxOutputTokens: 16000,
     contents: [
       {
@@ -544,10 +501,17 @@ if (isDebug) {
   }
 
 } catch (err) {
-  if(err.message.includes('empty response') || err.message.includes('TOO_MANY_ATTEMPTS_TRY_LATER')) {
-        await m.reply("aku tidak mengerti maksudmu, bisa kau ulangi lagi?")
-  } else await m.reply('Terjadi Kesalahan\n\n' + err.stack)
-  console.error(err)
+  const msg = err.message || ''
+  if (msg.includes('timeout') || msg.includes('ECONNABORTED') || msg.includes('ETIMEDOUT')) {
+    await m.reply("koneksi ke AI timeout, coba lagi ya~")
+  } else if (msg.includes('empty response') || msg.includes('TOO_MANY_ATTEMPTS_TRY_LATER')) {
+    await m.reply("aku tidak mengerti maksudmu, bisa kau ulangi lagi?")
+  } else if (msg.includes('429') || msg.includes('rate limit') || msg.includes('quota')) {
+    await m.reply("AI lagi overload, tunggu sebentar ya~")
+  } else {
+    await m.reply('Terjadi Kesalahan\n\n' + err.stack)
+  }
+  console.error('[Fiora Error]', err.message)
 }
         }
 
@@ -642,12 +606,11 @@ async function fioraResponse(response, conn, m, { startThinking }) {
       }
 
       if (mediaType === "sticker") {
-        const finalUrl = resolveVariantUrl(url);
-        const { data, mime } = await conn.getFile(finalUrl);
+        const { data, mime } = await conn.getFile(url);
                         const exif = { packName: global.stickpack, packPublish: global.stickauth };
                         const sticker = await (await import('../lib/exif.js')).writeExif({ mimetype: mime, data }, exif);
                         await conn.sendMessage(m.chat, { sticker }, { quoted: m, messageId: generateFioraID() });
-                        try { trackStickerUsage(finalUrl, m.chat, m.sender); } catch(e) {}
+                        try { trackStickerUsage(url, m.chat, m.sender); } catch(e) {}
       }
 
       if (mediaType === "audio") {
@@ -710,7 +673,7 @@ async function fioraRichResponse(rich_response, conn, m, { startThinking }) {
 }
 
 function generateFioraID() {
-        return generateMessageIDV2();
+        return 'HONOLULU' + generateMessageIDV2().slice(5);
         }
 
 async function getWaveForm(buffer, samples = 100) {
