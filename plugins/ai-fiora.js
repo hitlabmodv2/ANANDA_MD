@@ -256,6 +256,22 @@ let handler = async (m, { conn, text, usedPrefix, command, groupMetadata, isOwne
     }
     return m.reply("Stats sticker Honolulu sudah direset.")
 }
+        if (command == "honoai") {
+    if (!isOwner && !m.isGroup) return m.reply("Command ini hanya bisa dipakai owner atau di grup.")
+    if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
+    const arg = (text || "").trim().toLowerCase()
+    if (arg === "on") {
+        global.db.data.chats[m.chat].honoai = true
+        return m.reply("✅ Honolulu AI sudah *ON* di chat ini.")
+    } else if (arg === "off") {
+        global.db.data.chats[m.chat].honoai = false
+        return m.reply("⛔ Honolulu AI sudah *OFF* di chat ini.\nKirim *.honoai on* untuk aktifkan lagi.")
+    } else {
+        const status = global.db.data.chats[m.chat]?.honoai !== false ? "ON ✅" : "OFF ⛔"
+        return m.reply(`*Honolulu AI* saat ini: *${status}*\n\nGunakan:\n• *.honoai on* — aktifkan\n• *.honoai off* — matikan`)
+    }
+}
+        if (global.db.data.chats?.[m.chat]?.honoai === false) return
         const input = text
   ? text
   : m?.quoted?.text
@@ -268,6 +284,7 @@ let handler = async (m, { conn, text, usedPrefix, command, groupMetadata, isOwne
 
 handler.before = async function(m, { conn, text, usedPrefix, groupMetadata, isOwner, prefix }) {
         //if(!isOwner) return
+        if (global.db.data.chats?.[m.chat]?.honoai === false) return
         if(/^[‎xzXZ/!#\$%\+£¢€¥\^°=¶∆×÷π√✓©®:;\?&\.\\\-]/.test(m.text)) return
         if (
   (m?.quoted?.id.startsWith("HONOLULU") && !["templateButtonReplyMessage", "interactiveResponseMessage"].includes(m.mtype)) ||
@@ -279,9 +296,9 @@ handler.before = async function(m, { conn, text, usedPrefix, groupMetadata, isOw
                 }
         }
 
-handler.help = ['fiora','ai','honolulustic'];
+handler.help = ['fiora','ai','honolulustic','honoai'];
 handler.tags = ['ai'];
-handler.command = /^(fiora.*|honolulustic|honolulusticreset|honolulustats|honolulustatsreset|ai)$/i;
+handler.command = /^(fiora.*|honolulustic|honolulusticreset|honolulustats|honolulustatsreset|ai|honoai)$/i;
 
 export default handler;
 
