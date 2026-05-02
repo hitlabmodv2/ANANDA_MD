@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { URL } from 'url';
+import { URL, fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import crypto from 'crypto';
 import * as cheerio from 'cheerio';
 import { fileTypeFromBuffer } from 'file-type';
@@ -13,6 +14,10 @@ import { PassThrough } from 'stream';
 import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs';
 import { spawn } from 'child_process';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PERSONA_PATH = join(__dirname, '../lib/Honolulu-PERSONA.txt');
 
 function formatStageDirections(t) {
   if (typeof t !== 'string' || !t) return t
@@ -121,7 +126,7 @@ let handler = async (m, { conn, text, usedPrefix, command, groupMetadata, isOwne
         if (command == "fioraupdp") {
                 if(!isOwner) return
                 if(!m.quoted?.text) return m.reply("Reply teks prompt!");
-                await fs.writeFileSync('./lib/Honolulu-PERSONA.txt', m.quoted.text)
+                await fs.writeFileSync(PERSONA_PATH, m.quoted.text)
                 return m.reply("Success Update Persona.") 
                 }
         if (command == "fioraresetdb") {
@@ -1631,7 +1636,7 @@ mime: ${qFile.mimetype}`
 function prompt(user, m) {
         const time = getWIBDateTime()
         //const FACES = fs.readFileSync('./lib/F-59.txt').toString()
-        const PERSONA = fs.readFileSync('./lib/Honolulu-PERSONA.txt').toString() 
+        const PERSONA = fs.readFileSync(PERSONA_PATH, 'utf8')
         return `[SYSTEM PROMPT]\n
 ${PERSONA}
 
