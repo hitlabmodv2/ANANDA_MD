@@ -57,7 +57,45 @@ else
   C_CYAN=""; C_BLUE=""; C_MAGENTA=""
 fi
 
-CUSTOM_MSG="${1:-}"
+CUSTOM_MSG=""
+FORCE_UPLOAD_NODE_MODULES="${FORCE_UPLOAD_NODE_MODULES:-false}"
+
+# ===== Parse command-line flags =====
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --force-node-modules|--include-node-modules)
+      FORCE_UPLOAD_NODE_MODULES="true"
+      shift
+      ;;
+    --no-force-node-modules)
+      FORCE_UPLOAD_NODE_MODULES="false"
+      shift
+      ;;
+    --help|-h)
+      cat <<'EOF'
+Usage: bash push.sh [options] [commit message]
+
+Options:
+  --force-node-modules   Override .gitignore and upload node_modules too.
+  --no-force-node-modules  Keep node_modules excluded (default).
+  -h, --help             Show this help message.
+
+Examples:
+  FORCE_UPLOAD_NODE_MODULES=true bash push.sh
+  bash push.sh --force-node-modules "Update config"
+EOF
+      exit 0
+      ;;
+    *)
+      if [ -n "$CUSTOM_MSG" ]; then
+        CUSTOM_MSG="$CUSTOM_MSG $1"
+      else
+        CUSTOM_MSG="$1"
+      fi
+      shift
+      ;;
+  esac
+ done
 
 # ===== Helper: buka URL di browser (Termux / Linux / macOS) =====
 open_url() {

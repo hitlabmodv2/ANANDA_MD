@@ -13,10 +13,6 @@ replit.md
 data
 index.d.ts
 
-# node_modules JANGAN ikut ke-upload ke GitHub
-node_modules
-node_modules/**
-
 # Force-include .replit (override system gitignore)
 !.replit
 
@@ -34,3 +30,4 @@ jadibot/**
 !jadibot/.gitkeep
 # .token.secret = file token ASLI — JANGAN pernah di-commit!
 .token.secret
+node_modules
