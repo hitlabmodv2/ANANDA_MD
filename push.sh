@@ -34,6 +34,10 @@ REPO="HONOLULU_AI"
 # Nilai di sini cuma fallback kalau koneksi ke GitHub bermasalah.
 DEFAULT_BRANCH="HONOLULU_AI_V1_2_TSUNDERE"
 
+# Set ke true kalau ingin memaksa upload seluruh node_modules.
+# Default false karena node_modules biasanya direkomendasikan di-ignore.
+FORCE_UPLOAD_NODE_MODULES="${FORCE_UPLOAD_NODE_MODULES:-false}"
+
 # Branch yang disembunyikan dari menu (system / internal).
 # Pisahkan dengan spasi. Contoh: "replit-agent gh-pages backup"
 IGNORE_BRANCHES="replit-agent HEAD"
@@ -688,13 +692,16 @@ prepare_stage() {
     esac
   done
 
-  # Auto-untrack node_modules dari git index (file di disk tetap aman).
-  local nm_tracked
-  nm_tracked=$(git ls-files node_modules 2>/dev/null | wc -l | tr -d ' ')
-  if [ "$nm_tracked" -gt 0 ]; then
-    echo -e "  ${C_YELLOW}🧹 Untrack node_modules dari git (${nm_tracked} file)...${C_RESET}"
-    git rm -r --cached -q node_modules 2>>"$err_log" || true
-    echo -e "  ${C_DIM}   (file di disk tetap ada, cuma dilepas dari tracking git)${C_RESET}"
+  # Auto-untrack node_modules dari git index (file di disk tetap aman),
+  # kecuali FORCE_UPLOAD_NODE_MODULES diaktifkan.
+  if [ "$FORCE_UPLOAD_NODE_MODULES" != "true" ]; then
+    local nm_tracked
+    nm_tracked=$(git ls-files node_modules 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$nm_tracked" -gt 0 ]; then
+      echo -e "  ${C_YELLOW}🧹 Untrack node_modules dari git (${nm_tracked} file)...${C_RESET}"
+      git rm -r --cached -q node_modules 2>>"$err_log" || true
+      echo -e "  ${C_DIM}   (file di disk tetap ada, cuma dilepas dari tracking git)${C_RESET}"
+    fi
   fi
 
   # ⚠️  KEAMANAN: Auto-untrack .token.secret agar token asli tidak pernah ke-commit.
@@ -711,11 +718,17 @@ prepare_stage() {
     return 1
   fi
 
+  # Force-add node_modules jika diaktifkan, walau biasanya di-ignore.
+  if [ "$FORCE_UPLOAD_NODE_MODULES" = "true" ] && [ -d node_modules ]; then
+    echo -e "  ${C_YELLOW}⚠️  FORCE_UPLOAD_NODE_MODULES=true: memaksa add node_modules...${C_RESET}"
+    git add -f node_modules 2>>"$err_log" || true
+  fi
+
   # Pastikan .token.secret TIDAK pernah masuk stage — blokir paksa setelah git add -A.
   git rm --cached -q .token.secret 2>/dev/null || true
 
   # Force-add file penting yang biasanya di-ignore.
-  # CATATAN: node_modules & .token.secret SENGAJA TIDAK di-force-add.
+  # CATATAN: .token.secret SENGAJA TIDAK di-force-add.
   for forced in package-lock.json .env \
                 sessions/hisoka/creds.json \
                 sessions/hisoka/contacts.json \
