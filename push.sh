@@ -34,9 +34,9 @@ REPO="HONOLULU_AI"
 # Nilai di sini cuma fallback kalau koneksi ke GitHub bermasalah.
 DEFAULT_BRANCH="HONOLULU_AI_V1_2_TSUNDERE"
 
-# Set ke true kalau ingin memaksa upload seluruh node_modules.
-# Default false karena node_modules biasanya direkomendasikan di-ignore.
-FORCE_UPLOAD_NODE_MODULES="${FORCE_UPLOAD_NODE_MODULES:-false}"
+# node_modules sekarang ikut di-upload secara default.
+# Gunakan --no-force-node-modules jika memang ingin mengecualikannya.
+FORCE_UPLOAD_NODE_MODULES="${FORCE_UPLOAD_NODE_MODULES:-true}"
 
 # Branch yang disembunyikan dari menu (system / internal).
 # Pisahkan dengan spasi. Contoh: "replit-agent gh-pages backup"
@@ -58,7 +58,6 @@ else
 fi
 
 CUSTOM_MSG=""
-FORCE_UPLOAD_NODE_MODULES="${FORCE_UPLOAD_NODE_MODULES:-false}"
 
 # ===== Parse command-line flags =====
 while [ "$#" -gt 0 ]; do
@@ -76,13 +75,13 @@ while [ "$#" -gt 0 ]; do
 Usage: bash push.sh [options] [commit message]
 
 Options:
-  --force-node-modules   Override .gitignore and upload node_modules too.
-  --no-force-node-modules  Keep node_modules excluded (default).
-  -h, --help             Show this help message.
+  --force-node-modules     Upload node_modules too (default behavior).
+  --no-force-node-modules  Exclude node_modules from upload.
+  -h, --help               Show this help message.
 
 Examples:
-  FORCE_UPLOAD_NODE_MODULES=true bash push.sh
-  bash push.sh --force-node-modules "Update config"
+  bash push.sh
+  bash push.sh --no-force-node-modules "Update config"
 EOF
       exit 0
       ;;
@@ -730,16 +729,10 @@ prepare_stage() {
     esac
   done
 
-  # Auto-untrack node_modules dari git index (file di disk tetap aman),
-  # kecuali FORCE_UPLOAD_NODE_MODULES diaktifkan.
-  if [ "$FORCE_UPLOAD_NODE_MODULES" != "true" ]; then
-    local nm_tracked
-    nm_tracked=$(git ls-files node_modules 2>/dev/null | wc -l | tr -d ' ')
-    if [ "$nm_tracked" -gt 0 ]; then
-      echo -e "  ${C_YELLOW}🧹 Untrack node_modules dari git (${nm_tracked} file)...${C_RESET}"
-      git rm -r --cached -q node_modules 2>>"$err_log" || true
-      echo -e "  ${C_DIM}   (file di disk tetap ada, cuma dilepas dari tracking git)${C_RESET}"
-    fi
+  # node_modules sekarang ikut di-upload secara default.
+  # Jangan untrack folder ini kecuali pengguna pilih eksplisit --no-force-node-modules.
+  if [ "$FORCE_UPLOAD_NODE_MODULES" = "true" ] && [ -d node_modules ]; then
+    echo -e "  ${C_YELLOW}⚠️  node_modules ditemukan — akan disertakan dalam stage${C_RESET}"
   fi
 
   # ⚠️  KEAMANAN: Auto-untrack .token.secret agar token asli tidak pernah ke-commit.
@@ -756,9 +749,9 @@ prepare_stage() {
     return 1
   fi
 
-  # Force-add node_modules jika diaktifkan, walau biasanya di-ignore.
+  # Force-add node_modules jika diaktifkan.
   if [ "$FORCE_UPLOAD_NODE_MODULES" = "true" ] && [ -d node_modules ]; then
-    echo -e "  ${C_YELLOW}⚠️  FORCE_UPLOAD_NODE_MODULES=true: memaksa add node_modules...${C_RESET}"
+    echo -e "  ${C_YELLOW}⚠️  node_modules akan dipaksa ditambahkan ke stage${C_RESET}"
     git add -f node_modules 2>>"$err_log" || true
   fi
 
